@@ -1,10 +1,10 @@
 // Vehicle road-route service
-// Priority 1: backend proxy at VITE_DIRECTIONS_API_BASE_URL  (recommended for production)
+// Priority 1: backend proxy at VITE_API_BASE_URL  (recommended for production)
 // Priority 2: direct Kakao Mobility REST API with VITE_KAKAO_REST_API_KEY  (dev convenience only)
 //
 // Environment variables (set in .env, never hardcoded here):
-//   VITE_DIRECTIONS_API_BASE_URL  — backend proxy base URL (production)
-//   VITE_KAKAO_REST_API_KEY       — Kakao REST API key (dev only; not recommended for production)
+//   VITE_API_BASE_URL       — backend base URL (production: https://ev-delivery-charging-backend.onrender.com)
+//   VITE_KAKAO_REST_API_KEY — Kakao REST API key (dev only; not recommended for production)
 //
 // Recovery stack (applied in order, real-road only — fallback polylines never re-enabled):
 //   1. Grouped split       — up to KAKAO_WAYPOINT_LIMIT waypoints per request
@@ -16,7 +16,7 @@
 
 import { devWarn } from '../utils/devLog'
 
-const PROXY_BASE = (import.meta.env.VITE_DIRECTIONS_API_BASE_URL ?? '').replace(/\/$/, '')
+const PROXY_BASE = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 const REST_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY ?? ''
 
 const KAKAO_WAYPOINT_LIMIT = 5
@@ -135,7 +135,7 @@ async function callDirectionsAPI(origin, destination, waypoints) {
   }
 
   if (REST_KEY) {
-    // Dev only: direct call exposes key in network tab. Use VITE_DIRECTIONS_API_BASE_URL for production.
+    // Dev only: direct call exposes key in network tab. Use VITE_API_BASE_URL for production.
     const res = await fetch(
       `https://apis-navi.kakaomobility.com/v1/directions?${params}`,
       { headers: { Authorization: `KakaoAK ${REST_KEY}` } }

@@ -1,5 +1,5 @@
 // Charger data service layer.
-// fetchPublicChargers() — used exclusively by MVP-8 — requires VITE_CHARGER_API_BASE_URL.
+// fetchPublicChargers() — used exclusively by MVP-8 — requires VITE_API_BASE_URL.
 // If the env var is absent or the API fails it returns an error state (chargers: []).
 // It never falls back to sample data.
 // getChargers() and fetchNearbyChargers() are used by demo pages and may return sample data.
@@ -28,7 +28,7 @@
 //    - 별도 운영사별 요금 테이블 관리 또는 EV Infra 요금 API 연동 필요
 //
 // ── Required env var (no API key in frontend) ─────────────────────────────
-//   VITE_CHARGER_API_BASE_URL = https://your-backend-proxy.com
+//   VITE_API_BASE_URL = https://ev-delivery-charging-backend.onrender.com
 // ──────────────────────────────────────────────────────────────────────────
 
 import { CHARGERS } from '../data/chargerData'
@@ -36,7 +36,7 @@ import { devWarn } from '../utils/devLog'
 
 export { CHARGERS }
 
-const API_BASE = (import.meta.env.VITE_CHARGER_API_BASE_URL ?? '').replace(/\/$/, '')
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 
 // Fetch nearby chargers from the backend proxy.
 // Falls back to sample data if the API is not configured or returns an error.
@@ -61,7 +61,7 @@ export async function fetchNearbyChargers({ lat, lng, radiusKm = 10 } = {}) {
 // provider='mock'       → returns sample data immediately (default)
 // provider='public-api' → async-only; logs a warning and falls back to mock.
 //                         Use fetchPublicChargers() for actual API access.
-// provider='env-api'    → same as public-api placeholder; configure VITE_CHARGER_API_BASE_URL
+// provider='env-api'    → same as public-api placeholder; configure VITE_API_BASE_URL
 //                         then call fetchPublicChargers() from a useEffect.
 export function getChargers({ startPoint: _sp, routeBounds: _rb, provider = 'mock' } = {}) {
   if (provider === 'mock') return { chargers: CHARGERS, isSample: true, source: 'mock' }
@@ -70,11 +70,11 @@ export function getChargers({ startPoint: _sp, routeBounds: _rb, provider = 'moc
 }
 
 // Async public charger fetch with automatic mock fallback.
-// Requires VITE_CHARGER_API_BASE_URL pointing to a backend proxy that holds the API key.
+// Requires VITE_API_BASE_URL pointing to a backend proxy that holds the API key.
 // When the env var is absent or the fetch fails, returns mock chargers with a console.warn.
 export async function fetchPublicChargers({ lat, lng, radiusKm = 10 } = {}) {
   if (!API_BASE) {
-    devWarn('[chargerService] fetchPublicChargers: VITE_CHARGER_API_BASE_URL not configured.')
+    devWarn('[chargerService] fetchPublicChargers: VITE_API_BASE_URL not configured.')
     return { chargers: [], isSample: false, source: 'api-error', error: true, reason: 'no_base_url' }
   }
   try {
