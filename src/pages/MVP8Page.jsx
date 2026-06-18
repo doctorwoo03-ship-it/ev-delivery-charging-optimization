@@ -160,8 +160,8 @@ function PlaceSearch({ T, value, onChange, onSearch, status, results, selected, 
       </div>
 
       {status === 'searching' && <div style={{ fontSize: 12, color: T.textSecondary, padding: '6px 10px', background: T.surfaceSecondary, borderRadius: 6, marginBottom: 7 }}>검색 중...</div>}
-      {status === 'no-results' && <div style={{ fontSize: 12, color: T.textSecondary, padding: '6px 10px', background: T.surfaceSecondary, borderRadius: 6, marginBottom: 7 }}>결과 없음</div>}
-      {status === 'error' && <div style={{ fontSize: 12, color: T.danger, padding: '6px 10px', background: `${T.danger}14`, borderRadius: 6, marginBottom: 7 }}>장소 검색 불가 — 좌표 직접 입력을 사용하세요</div>}
+      {status === 'no-results' && <div style={{ fontSize: 12, color: T.textSecondary, padding: '6px 10px', background: T.surfaceSecondary, borderRadius: 6, marginBottom: 7 }}>검색 결과가 없습니다.</div>}
+      {status === 'error' && <div style={{ fontSize: 12, color: T.danger, padding: '6px 10px', background: `${T.danger}14`, borderRadius: 6, marginBottom: 7 }}>장소 검색 서비스를 불러오지 못했습니다.</div>}
 
       {status === 'done' && results.length > 0 && !selected && (
         <div style={{ marginBottom: 8, display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 200, overflowY: 'auto' }}>
@@ -791,6 +791,7 @@ export default function MVP8Page() {
     setStatus('searching'); setResults([]); setSelected(null)
     try {
       await loadKakaoServices()
+      if (!window.kakao?.maps?.services) throw new Error('services_unavailable')
     } catch { if (seq !== seqRef.current) return; setStatus('error'); return }
     if (seq !== seqRef.current) return
     const services = window.kakao.maps.services

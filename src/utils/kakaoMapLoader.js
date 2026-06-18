@@ -8,7 +8,7 @@
 //   VITE_KAKAO_MAP_API_KEY  (primary)
 //   VITE_KAKAO_MAP_KEY      (legacy fallback)
 //
-// Error codes: 'no_api_key' | 'sdk_load_failed' | 'services_unavailable'
+// Error messages: 'Kakao JavaScript API key is missing.' | 'sdk_load_failed' | 'services_unavailable'
 
 let _mapsPromise = null
 let _servicesPromise = null
@@ -34,13 +34,18 @@ export function loadKakaoServices() {
 }
 
 function _key() {
-  return import.meta.env.VITE_KAKAO_MAP_API_KEY || import.meta.env.VITE_KAKAO_MAP_KEY || ''
+  const raw = import.meta.env.VITE_KAKAO_MAP_API_KEY || import.meta.env.VITE_KAKAO_MAP_KEY || ''
+  // Reject placeholder values that result in a broken SDK URL.
+  // Happens when a Vercel env var is set to the variable *name* instead of the actual key value
+  // (e.g. VITE_KAKAO_MAP_API_KEY=VITE_KAKAO_MAP_API_KEY) or left as the .env.example default.
+  if (!raw || raw.startsWith('VITE_') || raw.startsWith('your_')) return ''
+  return raw
 }
 
 function _loadBase() {
   return new Promise((resolve, reject) => {
     const key = _key()
-    if (!key) { reject(new Error('no_api_key')); return }
+    if (!key) { reject(new Error('Kakao JavaScript API key is missing.')); return }
 
     // Case 1: maps object already exists — call load() to ensure APIs are initialized
     // (load() is idempotent: calls callback immediately if already done)
@@ -89,7 +94,7 @@ function _ensureServices() {
   if (window.kakao?.maps?.services) return Promise.resolve()
 
   const key = _key()
-  if (!key) return Promise.reject(new Error('no_api_key'))
+  if (!key) return Promise.reject(new Error('Kakao JavaScript API key is missing.'))
 
   // If the maps object is already initialised but services is absent, the SDK was booted
   // without libraries=services. The Kakao Maps SDK does not support adding libraries to an

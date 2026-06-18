@@ -580,11 +580,11 @@ function MapPanel({ T, themeName, deliveries, chargers, recommendedChargerId, ch
         }}>
           <span style={{ fontSize: 28 }}>🗺</span>
           <span style={{ fontSize: 13 }}>
-            {mapError === 'no_api_key' ? '카카오 API 키가 설정되지 않았습니다' : '지도를 불러올 수 없습니다'}
+            {mapError?.includes('missing') ? '카카오 API 키가 설정되지 않았습니다' : '지도를 불러올 수 없습니다'}
           </span>
           <span style={{ fontSize: 11, textAlign: 'center', lineHeight: 1.6 }}>
-            {mapError === 'no_api_key'
-              ? 'VITE_KAKAO_MAP_API_KEY 또는 VITE_KAKAO_MAP_KEY를 .env에 설정해 주세요'
+            {mapError?.includes('missing')
+              ? 'Kakao JavaScript API key is missing. — VITE_KAKAO_MAP_API_KEY를 Vercel 환경변수에 올바른 값으로 설정해 주세요'
               : mapError === 'sdk_load_failed'
               ? '카카오 Maps SDK 로드 실패 — 네트워크 연결 또는 Kakao 개발자 콘솔 도메인 설정을 확인해 주세요'
               : '카카오 개발자 콘솔의 도메인·API 키 설정을 확인해 주세요'}

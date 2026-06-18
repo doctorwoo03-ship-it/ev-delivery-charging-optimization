@@ -55,7 +55,7 @@ function MVP2Page() {
   useEffect(() => {
     const apiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY
 
-    if (!apiKey) {
+    if (!apiKey || apiKey.startsWith('VITE_') || apiKey.startsWith('your_')) {
       setStatus('error')
       return
     }

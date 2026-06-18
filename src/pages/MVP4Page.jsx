@@ -110,7 +110,7 @@ function MapPanel({ T, themeName, deliveries }) {
   // Create map and depot marker once per mount.
   useEffect(() => {
     const apiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY
-    if (!apiKey) { setMapStatus('error'); return }
+    if (!apiKey || apiKey.startsWith('VITE_') || apiKey.startsWith('your_')) { setMapStatus('error'); return }
 
     let cancelled = false
     let rafId = null
