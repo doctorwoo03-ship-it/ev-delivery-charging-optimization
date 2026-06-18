@@ -34,35 +34,36 @@ const mvpCards = [
     stage: 'MVP-4',
     subtitle: '경로 거리 계산',
     desc: '실제 배송 경로 거리 계산 및 충전 필요 여부 판단',
-    ready: false,
+    ready: true,
   },
   {
     to: '/mvp-5',
     stage: 'MVP-5',
     subtitle: '충전소 추천',
     desc: '경로 인근 충전소 후보 표시 및 최적 충전소 추천',
-    ready: false,
+    ready: true,
   },
   {
     to: '/mvp-6',
     stage: 'MVP-6',
     subtitle: '배송 순서 최적화',
-    desc: '다수 배송지 방문 순서 최적화 및 TSP 로직 적용',
-    ready: false,
+    desc: '출발지 선택 · 배송 순서 TSP 최적화 · 경로 편차 기반 충전소 추천 · 경로 1km 이내 마커 필터',
+    ready: true,
   },
   {
     to: '/mvp-7',
     stage: 'MVP-7',
-    subtitle: 'EV 경로 최적화',
-    desc: '배송 경로와 충전소 경유지를 통합한 EV 특화 최적 경로',
-    ready: false,
+    subtitle: 'EV 경로 인텔리전스',
+    desc: 'EV 경로 인텔리전스 및 경로 결정 설명 · 실도로 기반 경로 건강 점수 · 배송 가능/충전 권장/여유 부족/충전 필요/도달 불가/데이터 없음/SOC 확인 필요 7가지 상태 판정 · MVP-6 ↔ MVP-7 세션 복원 및 결정 근거 동기화 · 최소 도착 SOC·예상 도착 SOC·건강 점수 연동',
+    ready: true,
   },
   {
     to: '/mvp-8',
     stage: 'MVP-8',
-    subtitle: '내비게이션 안내',
-    desc: '단계별 주행 안내 UI 및 경로 폴리라인 지도 시각화',
+    subtitle: '내비게이션 및 실시간 충전소 연동',
+    desc: '충전소 데이터 provider 구조 준비 · 공공 충전소 API 연동 준비 · 실시간 충전소 상태/가용 슬롯 반영 예정 · 운전자 지도 화면 중심의 내비게이션형 경로 안내 고도화',
     ready: false,
+    inProgress: true,
   },
 ]
 
@@ -75,17 +76,19 @@ function IndexPage() {
       </header>
       <main className="index-main">
         <div className="mvp-grid">
-          {mvpCards.map(({ to, stage, subtitle, desc, ready }) => (
+          {mvpCards.map(({ to, stage, subtitle, desc, ready, inProgress }) => (
             <Link
               key={to}
               to={to}
-              className={`mvp-card${ready ? '' : ' mvp-card-pending'}`}
+              className={`mvp-card${ready ? '' : inProgress ? ' mvp-card-progress' : ' mvp-card-pending'}`}
             >
               <div className="mvp-card-header">
                 <span className="mvp-card-stage">{stage}</span>
                 {ready
                   ? <span className="mvp-badge-ready">완료</span>
-                  : <span className="mvp-badge-pending">예정</span>
+                  : inProgress
+                    ? <span className="mvp-badge-progress">진행 중</span>
+                    : <span className="mvp-badge-pending">예정</span>
                 }
               </div>
               <div className="mvp-card-subtitle">{subtitle}</div>

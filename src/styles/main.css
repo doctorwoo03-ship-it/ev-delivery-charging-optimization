@@ -165,6 +165,19 @@ header {
   font-weight: 600;
 }
 
+.mvp-badge-progress {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  background-color: #fff8e6;
+  color: #b7791f;
+  font-weight: 600;
+}
+
+.mvp-card-progress {
+  opacity: 0.95;
+}
+
 /* MVP 개발 흐름 카드 */
 .mvp-flow-card {
   display: block;
