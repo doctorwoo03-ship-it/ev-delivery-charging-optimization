@@ -1184,7 +1184,7 @@ export default function MVP8Page() {
           <div style={{ width: '30%', flexShrink: 0, borderRight: `1px solid ${T.border}`, overflowY: 'auto', background: T.surface, display: 'flex', flexDirection: 'column' }}>
 
             {/* Vehicle cluster */}
-            <div style={{ margin: '12px 12px 0', borderRadius: 10, background: T.bg, border: `1px solid ${T.border}`, overflow: 'hidden' }}>
+            <div style={{ margin: '12px 12px 0', borderRadius: 10, background: T.bg, border: `1px solid ${T.border}`, overflow: 'hidden', flexShrink: 0 }}>
               <div style={{ padding: '10px 14px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                   <div style={{ fontSize: HMI.text.title, fontWeight: 600, color: T.text, lineHeight: 1.2 }}>{vehicle?.fullName}</div>
