@@ -60,10 +60,9 @@ const mvpCards = [
   {
     to: '/mvp-8',
     stage: 'MVP-8',
-    subtitle: '내비게이션 및 실시간 충전소 연동',
-    desc: '충전소 데이터 provider 구조 준비 · 공공 충전소 API 연동 준비 · 실시간 충전소 상태/가용 슬롯 반영 예정 · 운전자 지도 화면 중심의 내비게이션형 경로 안내 고도화',
-    ready: false,
-    inProgress: true,
+    subtitle: '통합 드라이버 플로우',
+    desc: '5단계 설정 마법사 · SafeMap/KE 공공 충전소 API 연동 · 카카오 실도로 경로 거리 적용 · 안전 하한 SOC 기반 충전 삽입 지점 결정 · 장소 검색 · 세션 복원 · 다크/라이트 테마',
+    ready: true,
   },
 ]
 
