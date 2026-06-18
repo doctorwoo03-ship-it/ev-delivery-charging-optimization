@@ -878,7 +878,20 @@ export default function MVP8Page() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   const zoneH = `calc(100vh - ${OUTER_HDR}px - ${HDR}px - ${BAR}px)`
-  const statusCfg = overlayState ? getStatusCfg(overlayState, T) : null
+  // Derive the driver-facing status label dynamically.
+  // chargeNeeded with a mid-route insertion point should NOT say "출발 전 충전 필요";
+  // the actual insertion timing (e.g. "3번 배송 후 충전 필요") must propagate consistently
+  // to the top badge, bottom chip, and EVIntelligencePanel.
+  const statusCfg = (() => {
+    if (!overlayState) return null
+    const base = getStatusCfg(overlayState, T)
+    if (overlayState === 'chargeNeeded' && chargingInsertionPoint?.insertionType !== 'before-departure') {
+      const afterIdx = chargingInsertionPoint?.afterDeliveryIndex
+      const label = afterIdx != null ? `${afterIdx + 1}번 배송 후 충전 필요` : '배송 중 충전 필요'
+      return { ...base, label }
+    }
+    return base
+  })()
 
   return (
     <div style={{ position: 'fixed', top: OUTER_HDR, left: 0, right: 0, bottom: 0, zIndex: 10, display: 'flex', flexDirection: 'column', fontFamily: FONT, background: T.bg, color: T.text, overflow: 'hidden' }}>
@@ -1222,10 +1235,10 @@ export default function MVP8Page() {
                 const gap = (isReserveWarning || isPreDepartureCharge) ? parseFloat((userMinReserveSoc - remainingSocAfterDelivery).toFixed(1)) : null
                 const statusText = effectiveChargeNeeded ? '충전 없이 배송 시 기준' : isPreDepartureCharge ? '출발 전 충전 필요' : isLowMargin ? '안전 여유 부족' : isReserveWarning ? `기준보다 ${gap}%p 부족` : '기준 충족'
                 return (
-                  <div style={{ padding: '4px 14px 4px', borderTop: `1px solid ${T.border}` }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: HMI.text.caption, color: T.textSecondary }}>{effectiveChargeNeeded ? '충전 전 배송 완료 예상 SOC' : '배송 완료 예상 SOC'}</span>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                  <div style={{ padding: '6px 14px 4px', borderTop: `1px solid ${T.border}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                      <span style={{ fontSize: HMI.text.caption, color: T.textSecondary, minWidth: 0, lineHeight: 1.3 }}>{effectiveChargeNeeded ? '충전 전 배송 완료 예상 SOC' : '배송 완료 예상 SOC'}</span>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 1, flexShrink: 0 }}>
                         <span style={{ fontSize: HMI.text.body, fontWeight: 600, color: arrColor }}>{remainingSocAfterDelivery.toFixed(1)}</span>
                         <span style={{ fontSize: HMI.text.caption, color: T.textSecondary }}>%</span>
                       </div>
@@ -1234,10 +1247,10 @@ export default function MVP8Page() {
                   </div>
                 )
               })()}
-              <div style={{ padding: '4px 14px 5px', borderTop: `1px solid ${T.border}` }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: HMI.text.caption, color: T.textSecondary }}>안전 하한 SOC</span>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+              <div style={{ padding: '7px 14px 8px', borderTop: `1px solid ${T.border}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                  <span style={{ fontSize: HMI.text.caption, color: T.textSecondary, minWidth: 0, lineHeight: 1.3 }}>안전 하한 SOC</span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 1, flexShrink: 0 }}>
                     <span style={{ fontSize: HMI.text.body, fontWeight: 600, color: isPreDepartureCharge ? T.danger : isReserveWarning ? T.warning : T.textSecondary }}>{userMinReserveSoc}</span>
                     <span style={{ fontSize: HMI.text.caption, color: T.textSecondary }}>%</span>
                   </div>
