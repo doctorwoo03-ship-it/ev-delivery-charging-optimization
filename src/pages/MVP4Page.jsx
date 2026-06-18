@@ -178,7 +178,7 @@ function MapPanel({ T, themeName, deliveries }) {
         existing.onload = () => { if (prev) prev(); onSDKReady() }
       } else {
         const script = document.createElement('script')
-        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&autoload=false`
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&autoload=false&libraries=services`
         script.async = true
         script.onload = onSDKReady
         script.onerror = () => { if (!cancelled) setMapStatus('error') }

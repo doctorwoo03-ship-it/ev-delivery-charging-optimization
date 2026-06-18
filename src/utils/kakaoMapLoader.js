@@ -91,19 +91,30 @@ function _ensureServices() {
   const key = _key()
   if (!key) return Promise.reject(new Error('no_api_key'))
 
-  // SDK was loaded without libraries=services (e.g. from MVP-0~4 page).
-  // Inject an addon script — Kakao SDK supports appending libraries this way.
+  // If the maps object is already initialised but services is absent, the SDK was booted
+  // without libraries=services. The Kakao Maps SDK does not support adding libraries to an
+  // already-running instance via a second script tag — maps.load() becomes a no-op after the
+  // first initialisation, so the callback either fires synchronously with services still
+  // undefined, or never fires at all (causing an indefinite hang in the caller).
+  // Reject immediately so the search UI shows an error without delay.
+  if (window.kakao?.maps) return Promise.reject(new Error('services_unavailable'))
+
+  // SDK not yet initialised — inject with libraries=services and wait.
+  // The 5-second timeout is a safety net for unexpected network or SDK delays.
   return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('services_unavailable')), 5000)
+    const settle = (err) => { clearTimeout(timer); err ? reject(err) : resolve() }
+
     const addon = document.createElement('script')
     addon.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&autoload=false&libraries=services`
     addon.async = true
     addon.onload = () => {
       window.kakao.maps.load(() => {
-        if (window.kakao?.maps?.services) resolve()
-        else reject(new Error('services_unavailable'))
+        if (window.kakao?.maps?.services) settle()
+        else settle(new Error('services_unavailable'))
       })
     }
-    addon.onerror = () => reject(new Error('sdk_load_failed'))
+    addon.onerror = () => settle(new Error('sdk_load_failed'))
     document.head.appendChild(addon)
   })
 }
