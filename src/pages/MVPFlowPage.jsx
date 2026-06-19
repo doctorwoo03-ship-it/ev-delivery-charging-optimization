@@ -132,9 +132,9 @@ function MVPFlowPage() {
                   {badge.label}
                 </span>
               </div>
-              <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexWrap: 'wrap', gap: '2px 16px' }}>
+              <ul style={{ margin: 0, paddingLeft: 22 }}>
                 {features.map((f) => (
-                  <li key={f} style={{ fontSize: 12, color: '#64748b' }}>{f}</li>
+                  <li key={f} style={{ fontSize: 13, color: '#64748b', lineHeight: 1.7, marginBottom: 4, listStylePosition: 'outside' }}>{f}</li>
                 ))}
               </ul>
             </Link>

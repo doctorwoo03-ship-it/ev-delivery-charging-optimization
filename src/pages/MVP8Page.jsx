@@ -254,6 +254,14 @@ const INTEL_REASON = {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function MVP8Page() {
+  // Landing Page에서 ?start=1 로 진입한 경우 세션을 초기화하고 차량 선택부터 시작.
+  // useState 레이지 이니셜라이저보다 먼저 실행되어야 한다.
+  ;(() => {
+    if (new URLSearchParams(window.location.search).get('start') !== '1') return
+    clearMvp8Session()
+    clearChargerCache()
+  })()
+
   const [themeName, setThemeName] = useState(getInitialTheme)
   const T = THEMES[themeName]
   const toggleTheme = () => setThemeName(prev => {
@@ -660,6 +668,13 @@ export default function MVP8Page() {
     link.id = 'ev-pretendard'; link.rel = 'stylesheet'
     link.href = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css'
     document.head.appendChild(link)
+  }, [])
+
+  // ?start=1 query param을 URL에서 제거 (히스토리에 남기지 않음)
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('start') === '1') {
+      window.history.replaceState(null, '', window.location.pathname)
+    }
   }, [])
 
   useEffect(() => { saveUserMinReserveSoc(userMinReserveSoc) }, [userMinReserveSoc])
@@ -1460,23 +1475,15 @@ export default function MVP8Page() {
             {/* Route health score */}
             {intlHealthScore != null && (
               <div style={{ margin: '8px 12px 0', padding: '10px 12px', background: T.bg, border: `1px solid ${T.border}`, borderRadius: 9 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                   <span style={{ fontSize: HMI.text.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em' }}>경로 건강 점수</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {intlConfidence && (
-                      <span style={{ fontSize: 9, color: ({ none: T.textSecondary, low: T.warning, medium: T.accent, high: T.success })[intlConfidence], padding: '1px 6px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surfaceSecondary }}>
-                        신뢰도 {({ none: '없음', low: '낮음', medium: '보통', high: '높음' })[intlConfidence]}
-                      </span>
-                    )}
-                    <button
-                      onClick={() => setShowDetailsPanel(true)}
-                      style={{ fontSize: 10, padding: '2px 8px', borderRadius: 5, border: `1px solid ${T.accent}50`, background: `${T.accent}12`, color: T.accent, cursor: 'pointer', fontFamily: FONT, fontWeight: 600 }}
-                    >
-                      판단 근거 보기
-                    </button>
-                  </div>
+                  {intlConfidence && (
+                    <span style={{ fontSize: 9, color: ({ none: T.textSecondary, low: T.warning, medium: T.accent, high: T.success })[intlConfidence], padding: '1px 6px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surfaceSecondary }}>
+                      신뢰도 {({ none: '없음', low: '낮음', medium: '보통', high: '높음' })[intlConfidence]}
+                    </span>
+                  )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                   <span style={{ fontSize: HMI.text.title, fontWeight: 700, color: intlHealthScore >= 80 ? T.success : intlHealthScore >= 60 ? T.warning : T.danger }}>{intlHealthScore}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ height: 6, background: T.border, borderRadius: 3, overflow: 'hidden' }}>
@@ -1485,6 +1492,18 @@ export default function MVP8Page() {
                     <div style={{ fontSize: 9, color: T.textSecondary, marginTop: 3 }}>{intlHealthScore >= 80 ? '양호' : intlHealthScore >= 60 ? '주의' : '위험'} / 100점</div>
                   </div>
                 </div>
+                <button
+                  onClick={() => setShowDetailsPanel(true)}
+                  style={{
+                    width: '100%', padding: '8px 0', borderRadius: 8,
+                    border: `1px solid ${T.accent}40`, background: `${T.accent}0f`,
+                    color: T.accent, cursor: 'pointer', fontFamily: FONT,
+                    fontWeight: 700, fontSize: 'clamp(12px, 1.3vh, 14px)',
+                    textAlign: 'center', lineHeight: 1, letterSpacing: '-0.2px',
+                  }}
+                >
+                  판단 근거 보기 →
+                </button>
               </div>
             )}
 
