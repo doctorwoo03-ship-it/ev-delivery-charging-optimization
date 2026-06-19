@@ -130,7 +130,7 @@ function VehicleImage({ src, alt, T, maxWidth, maxHeight }) {
       src={src}
       alt={alt ?? ''}
       onError={() => setFailed(true)}
-      style={{ maxWidth: maxWidth ?? 200, maxHeight: maxHeight ?? 88, objectFit: 'contain', display: 'block' }}
+      style={{ maxWidth: maxWidth ?? 200, maxHeight: maxHeight ?? 88, width: 'auto', height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }}
     />
   )
 }
@@ -998,8 +998,8 @@ export default function MVP8Page() {
                         {filteredVehicles.map(v => (
                           <div key={v.id} onClick={() => setSelectedId(v.id)}
                             style={{ cursor: 'pointer', border: `1px solid ${selectedId === v.id ? T.accent : T.border}`, background: selectedId === v.id ? `${T.accent}10` : T.surfaceSecondary, borderRadius: 8, overflow: 'hidden', userSelect: 'none' }}>
-                            <div style={{ height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.bg, padding: 6 }}>
-                              {v.image ? <img src={v.image} alt={v.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <VehicleSvg T={T} />}
+                            <div style={{ height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.bg, padding: '8px 10px', overflow: 'hidden' }}>
+                              <VehicleImage src={v.image} alt={v.name} T={T} maxWidth={120} maxHeight={64} />
                             </div>
                             <div style={{ padding: '8px 10px' }}>
                               <div style={{ fontSize: 12, fontWeight: 600, color: selectedId === v.id ? T.accent : T.text, marginBottom: 4 }}>{v.name}</div>
@@ -1232,8 +1232,8 @@ export default function MVP8Page() {
                 </div>
               </div>
 
-              <div style={{ padding: '6px 14px 4px', display: 'flex', justifyContent: 'center', minHeight: 88, alignItems: 'center' }}>
-                <VehicleImage src={vehicle?.image} alt={vehicle?.fullName ?? ''} T={T} />
+              <div style={{ padding: '8px 14px 6px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100, overflow: 'hidden' }}>
+                <VehicleImage src={vehicle?.image} alt={vehicle?.fullName ?? ''} T={T} maxWidth={190} maxHeight={90} />
               </div>
               <div style={{ padding: '2px 14px 8px' }}>
                 <BatteryBar percent={soc} T={T} />
