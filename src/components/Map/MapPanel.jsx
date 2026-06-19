@@ -651,11 +651,13 @@ function MapPanel({ T, themeName, deliveries, chargers, recommendedChargerId, ch
           </div>
         )}
         <div style={{
-          display: 'flex', gap: 10, padding: '5px 10px',
-          background: themeName === 'dark' ? 'rgba(10,11,13,0.72)' : 'rgba(255,255,255,0.85)',
-          borderRadius: 6, backdropFilter: 'blur(4px)',
+          display: 'flex', gap: 10, padding: '6px 12px',
+          background: themeName === 'dark' ? 'rgba(10,11,13,0.76)' : 'rgba(255,255,255,0.90)',
+          borderRadius: 7, backdropFilter: 'blur(6px)',
           flexWrap: 'wrap', alignItems: 'center',
+          border: themeName === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.07)',
         }}>
+          {/* 마커 범례 */}
           {[
             { color: '#F59E0B', label: '출발지' },
             { color: '#3E6AE1', label: '배송지' },
@@ -666,19 +668,20 @@ function MapPanel({ T, themeName, deliveries, chargers, recommendedChargerId, ch
               {label}
             </span>
           ))}
+
+          {/* 경로 범례 구분선 */}
+          <span style={{ width: 1, height: 12, background: 'rgba(128,128,128,0.4)', display: 'inline-block', flexShrink: 0 }} />
+
+          {/* 경로 선 범례 — 항상 표시 */}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: T.text }}>
+            <span style={{ width: 16, height: 3, borderRadius: 1.5, background: '#3E6AE1', display: 'inline-block', flexShrink: 0 }} />
+            배송 경로
+          </span>
           {chargerWaypoint && (
-            <>
-              <span style={{ width: 1, height: 12, background: 'rgba(128,128,128,0.4)', display: 'inline-block', flexShrink: 0 }} />
-              {[
-                { color: '#F59E0B', label: '충전 경유' },
-                { color: '#3E6AE1', label: '배송 경로' },
-              ].map(({ color, label }) => (
-                <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: T.text }}>
-                  <span style={{ width: 14, height: 3, borderRadius: 1.5, background: color, display: 'inline-block', flexShrink: 0 }} />
-                  {label}
-                </span>
-              ))}
-            </>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: T.text }}>
+              <span style={{ width: 16, height: 3, borderRadius: 1.5, background: '#F59E0B', display: 'inline-block', flexShrink: 0 }} />
+              충전소 경로
+            </span>
           )}
         </div>
       </div>

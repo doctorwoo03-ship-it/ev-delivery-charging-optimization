@@ -29,6 +29,8 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
   }
   const touchNormal = hmi?.touch?.normal ?? 48
 
+  const isMidRouteCharge = state === 'chargeNeeded' && data?.insertionType && data.insertionType !== 'before-departure'
+
   return (
     <div style={{
       position: 'absolute',
@@ -36,7 +38,9 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
       left: '50%',
       transform: 'translateX(-50%)',
       zIndex: 10,
-      width: 'min(clamp(520px, 42vw, 760px), calc(100% - 32px))',
+      width: isMidRouteCharge
+        ? 'min(clamp(780px, 68vw, 1080px), calc(100% - 32px))'
+        : 'min(clamp(660px, 56vw, 920px), calc(100% - 32px))',
       background: bgColor,
       borderRadius: 12,
       border: `1px solid ${cfg.color}45`,
@@ -52,7 +56,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         display: 'flex', alignItems: 'center', gap: 8,
         borderRadius: '12px 12px 0 0',
       }}>
-        <span style={{ fontSize: fs.bodyStrong, fontWeight: 600, color: cfg.color }}>
+        <span style={{ fontSize: fs.bodyStrong, fontWeight: 600, color: cfg.color, whiteSpace: 'nowrap' }}>
           {cfg.icon}{' '}
           {state === 'chargeNeeded' && data?.insertionLabel
             ? data.insertionLabel
@@ -65,7 +69,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
       </div>
 
       {/* Body */}
-      <div style={{ padding: '12px 16px 14px' }}>
+      <div style={{ padding: '14px 20px 16px' }}>
         {state === 'canDeliver' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Next action */}
@@ -244,9 +248,6 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               <div style={{ fontSize: fs.caption, color: T.textSecondary }}>
                 현재 배터리가 안전 하한 SOC보다 낮습니다.
               </div>
-              <div style={{ fontSize: fs.caption, color: T.textSecondary, marginTop: 2 }}>
-                대기 시간 미포함 · 대기 정보 미확인
-              </div>
             </div>
 
             {/* Block 3: Recommended charger if available */}
@@ -284,7 +285,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'chargeNeeded' && (
           <div style={{ display: 'flex', gap: 0, flexWrap: 'wrap' }}>
             {/* Block 1: Charger stop */}
-            <div style={{ flex: '0 0 auto', minWidth: 150, paddingRight: 20 }}>
+            <div style={{ flex: '0 0 auto', minWidth: 180, paddingRight: 20 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 경유 충전소
               </div>
@@ -303,11 +304,13 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               )}
               {data.recommendationReason && (
                 <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 4 }}>
-                  {data.recommendationReason.split(' · ').map(tag => (
-                    <span key={tag} style={{ fontSize: 9, padding: '1px 5px', borderRadius: 8, background: `${cfg.color}18`, border: `1px solid ${cfg.color}30`, color: cfg.color, fontWeight: 500, whiteSpace: 'nowrap' }}>
-                      {tag}
-                    </span>
-                  ))}
+                  {data.recommendationReason.split(' · ')
+                    .filter(tag => tag !== '대기 정보 미확인')
+                    .map(tag => (
+                      <span key={tag} style={{ fontSize: 9, padding: '1px 5px', borderRadius: 8, background: `${cfg.color}18`, border: `1px solid ${cfg.color}30`, color: cfg.color, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                        {tag}
+                      </span>
+                    ))}
                 </div>
               )}
               <div style={{ fontSize: fs.body, color: T.textSecondary }}>
@@ -329,9 +332,6 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
                 <div style={{ fontSize: fs.body, color: T.textSecondary, marginBottom: 2 }}>
                   약 {data.chargePlan.totalExtraCost.toLocaleString('ko-KR')}원
                 </div>
-                <div style={{ fontSize: fs.caption, color: T.textSecondary }}>
-                  대기 시간 미포함 · 대기 정보 미확인
-                </div>
                 {data.deliverySuccessPct != null && (
                   <div style={{ fontSize: fs.caption, color: T.success, fontWeight: 600, marginTop: 4 }}>
                     배송 성공 {data.deliverySuccessPct}%
@@ -351,7 +351,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
 
             {/* Block 3: Delivery feasibility */}
             {data.chargePlan && (
-              <div style={{ flex: '0 0 auto', minWidth: 120 }}>
+              <div style={{ flex: '0 0 auto', minWidth: 150 }}>
                 <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                   충전 후 배송
                 </div>
@@ -371,6 +371,11 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
             {data.firstViolationLabel && (
               <div style={{ flex: '1 1 100%', marginTop: 10, paddingTop: 8, borderTop: `1px solid ${T.border}30`, fontSize: fs.caption, color: T.textSecondary }}>
                 안전 하한 SOC 위반 구간: {data.firstViolationLabel}
+              </div>
+            )}
+            {isMidRouteCharge && (
+              <div style={{ flex: '1 1 100%', marginTop: 8, paddingTop: 8, borderTop: `1px solid ${T.border}30`, fontSize: fs.caption, color: T.textSecondary, lineHeight: 1.65 }}>
+                현재 배터리로 앞 배송지는 가능하지만, 다음 구간에서 안전 하한 SOC 아래로 떨어질 수 있어 중간 충전을 권장해요.
               </div>
             )}
           </div>

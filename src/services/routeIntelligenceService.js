@@ -167,27 +167,134 @@ function isReserveWarningRoute({ chargeNeeded, energySection, userMinReserveSoc 
   return remainingSOC < userMinReserveSoc
 }
 
-function computeHealthScore({ chargeNeeded, chargerReachable, isFallback, confidenceLevel, recommendationMode, energySection, batterySOC, userMinReserveSoc }) {
-  let score = 100
-  if (isFallback) score -= 15
-  if (confidenceLevel === 'low') score -= 10
-  else if (confidenceLevel === 'none') score -= 20
-  // no-local-data: data gap, not a charger failure — don't apply the -40 unreachable penalty
-  if (recommendationMode !== 'no-local-data') {
-    if (chargeNeeded && chargerReachable === false) score -= 40
-    else if (chargeNeeded && chargerReachable) score -= 5
-  } else {
-    score -= 10  // mild penalty: charger data missing
-  }
-  // Low-margin deductions
+// ---------------------------------------------------------------------------
+// 운행 안정도 복합 점수 모델 (100점 만점, 6개 항목)
+// A: 배송 완주 가능성 25 · B: 안전 하한 SOC 여유 25
+// C: 충전 전략 적합성 20 · D: 우회거리·시간 효율 10
+// E: 충전소 후보 품질 10 · F: 데이터 신뢰도 10
+// ---------------------------------------------------------------------------
+function computeOperationStabilityScore({
+  chargeNeeded, chargerReachable, isFallback, confidenceLevel,
+  recommendationMode, energySection, batterySOC, userMinReserveSoc,
+  minRouteSocPct, recommendedCharger,
+}) {
   const remainingSOC = energySection?.remainingSOC ?? null
-  const rangeAfterRouteKm = energySection?.rangeAfterRouteKm ?? null
-  if (remainingSOC != null && remainingSOC < SYSTEM_SAFETY_SOC_THRESHOLD) score -= 20
-  if (rangeAfterRouteKm != null && rangeAfterRouteKm < 3 && !chargeNeeded) score -= 15
-  if (batterySOC != null && batterySOC <= 5) score -= 15
-  // Reserve warning deduction: user's minimum SOC preference not met (but above safety threshold)
-  if (isReserveWarningRoute({ chargeNeeded, energySection, userMinReserveSoc })) score -= 10
-  return Math.max(0, Math.min(100, score))
+  const socToCheck   = minRouteSocPct ?? remainingSOC
+  const detourKm     = recommendedCharger?.insertionDetourKm ?? null
+
+  // ── A. 배송 완주 가능성 (25 pts) ─────────────────────────────────────
+  let scoreA
+  if (!chargeNeeded) {
+    if (remainingSOC == null) {
+      scoreA = 15
+    } else if (remainingSOC >= 20) {
+      scoreA = 25
+    } else if (remainingSOC >= SYSTEM_SAFETY_SOC_THRESHOLD) {
+      scoreA = Math.round(12 + (remainingSOC - SYSTEM_SAFETY_SOC_THRESHOLD) / (20 - SYSTEM_SAFETY_SOC_THRESHOLD) * 13)
+    } else {
+      scoreA = Math.max(0, Math.round(remainingSOC / SYSTEM_SAFETY_SOC_THRESHOLD * 12))
+    }
+  } else if (chargerReachable && recommendationMode !== 'no-local-data') {
+    scoreA = 15
+  } else if (chargerReachable === false || recommendationMode === 'no-local-data') {
+    scoreA = 3
+  } else {
+    scoreA = 8
+  }
+  scoreA = Math.max(0, Math.min(25, scoreA))
+
+  // ── B. 안전 하한 SOC 여유 (25 pts) ───────────────────────────────────
+  let scoreB
+  if (socToCheck == null) {
+    scoreB = 12
+  } else if (socToCheck >= userMinReserveSoc + 15) {
+    scoreB = 25
+  } else if (socToCheck >= userMinReserveSoc) {
+    scoreB = Math.round(15 + (socToCheck - userMinReserveSoc) / 15 * 10)
+  } else if (socToCheck >= SYSTEM_SAFETY_SOC_THRESHOLD) {
+    const range = Math.max(1, userMinReserveSoc - SYSTEM_SAFETY_SOC_THRESHOLD)
+    scoreB = Math.max(5, Math.round(5 + (socToCheck - SYSTEM_SAFETY_SOC_THRESHOLD) / range * 10))
+  } else {
+    scoreB = Math.max(0, Math.round(socToCheck / SYSTEM_SAFETY_SOC_THRESHOLD * 5))
+  }
+  scoreB = Math.max(0, Math.min(25, scoreB))
+
+  // ── C. 충전 전략 적합성 (20 pts) ─────────────────────────────────────
+  let scoreC
+  if (!chargeNeeded && remainingSOC != null && remainingSOC >= userMinReserveSoc) {
+    scoreC = 20
+  } else if (!chargeNeeded) {
+    scoreC = 14
+  } else if (recommendationMode === 'no-local-data') {
+    scoreC = 4
+  } else if (chargerReachable === false) {
+    scoreC = 2
+  } else if (recommendationMode === 'review-candidate') {
+    scoreC = 8
+  } else if (chargeNeeded && chargerReachable) {
+    scoreC = recommendationMode === 'mid-route' ? 14 : 16
+  } else {
+    scoreC = 7
+  }
+  scoreC = Math.max(0, Math.min(20, scoreC))
+
+  // ── D. 우회거리·시간 효율 (10 pts) ───────────────────────────────────
+  let scoreD
+  if (!chargeNeeded) {
+    scoreD = 10
+  } else if (chargerReachable === false) {
+    scoreD = 1
+  } else if (detourKm == null) {
+    scoreD = 7
+  } else if (detourKm <= 1) {
+    scoreD = 10
+  } else if (detourKm <= 3) {
+    scoreD = 8
+  } else if (detourKm <= 5) {
+    scoreD = 6
+  } else if (detourKm < 8) {
+    scoreD = 3
+  } else {
+    scoreD = 1
+  }
+  scoreD = Math.max(0, Math.min(10, scoreD))
+
+  // ── E. 충전소 후보 품질 (10 pts) ──────────────────────────────────────
+  let scoreE
+  if (!chargeNeeded) {
+    scoreE = 10
+  } else if (chargerReachable === false || recommendationMode === 'no-local-data') {
+    scoreE = 1
+  } else if (recommendationMode === 'review-candidate') {
+    scoreE = 4
+  } else if (recommendedCharger) {
+    const kw = recommendedCharger.powerKw ?? recommendedCharger.maxPowerKw ?? 0
+    scoreE = kw >= 100 ? 10 : kw >= 50 ? 8 : kw >= 30 ? 6 : kw >= 7 ? 4 : 2
+  } else {
+    scoreE = 6
+  }
+  scoreE = Math.max(0, Math.min(10, scoreE))
+
+  // ── F. 데이터 신뢰도 (10 pts) ─────────────────────────────────────────
+  let scoreF = 10
+  if (isFallback) scoreF -= 4
+  if (confidenceLevel === 'none') scoreF -= 4
+  else if (confidenceLevel === 'low') scoreF -= 2
+  if (recommendationMode === 'no-local-data') scoreF -= 3
+  scoreF = Math.max(0, Math.min(10, scoreF))
+
+  const total = Math.max(0, Math.min(100, scoreA + scoreB + scoreC + scoreD + scoreE + scoreF))
+  return {
+    score: total,
+    breakdown: [
+      { label: '배송 완주 가능성',   earned: scoreA, max: 25 },
+      { label: '안전 하한 SOC 여유', earned: scoreB, max: 25 },
+      { label: '충전 전략 적합성',   earned: scoreC, max: 20 },
+      { label: '우회거리·시간 효율', earned: scoreD, max: 10 },
+      { label: '충전소 후보 품질',   earned: scoreE, max: 10 },
+      { label: '데이터 신뢰도',      earned: scoreF, max: 10 },
+    ],
+  }
 }
 
 function buildHealthDeductions({ chargeNeeded, chargerReachable, isFallback, confidenceLevel, recommendationMode, energySection, batterySOC, userMinReserveSoc }) {
@@ -201,7 +308,6 @@ function buildHealthDeductions({ chargeNeeded, chargerReachable, isFallback, con
     items.push({ amount: -5, label: '충전 경유 필요' })
   }
   if (recommendationMode === 'no-local-data') items.push({ amount: 0, label: '충전소 샘플 데이터 없음' })
-  // Low-margin deductions
   const remainingSOC = energySection?.remainingSOC ?? null
   const rangeAfterRouteKm = energySection?.rangeAfterRouteKm ?? null
   if (remainingSOC != null && remainingSOC < SYSTEM_SAFETY_SOC_THRESHOLD) {
@@ -213,14 +319,13 @@ function buildHealthDeductions({ chargeNeeded, chargerReachable, isFallback, con
   if (batterySOC != null && batterySOC <= 5) {
     items.push({ amount: -15, label: '출발 SOC 낮음' })
   }
-  // Reserve warning deduction: user's minimum SOC preference not met
   if (isReserveWarningRoute({ chargeNeeded, energySection, userMinReserveSoc })) {
     items.push({ amount: -10, label: `최소 SOC 기준 미달 (설정 ${userMinReserveSoc}%)` })
   }
   return items
 }
 
-function buildSummarySection({ chargeNeeded, chargerReachable, isFallback, confidenceLevel, userProfile, recommendationMode, mockCoverageWarning, energySection, batterySOC, userMinReserveSoc }) {
+function buildSummarySection({ chargeNeeded, chargerReachable, isFallback, confidenceLevel, userProfile, recommendationMode, mockCoverageWarning, energySection, batterySOC, userMinReserveSoc, minRouteSocPct, recommendedCharger }) {
   const lowMargin    = isLowMarginRoute({ chargeNeeded, energySection })
   const reserveWarn  = isReserveWarningRoute({ chargeNeeded, energySection, userMinReserveSoc })
 
@@ -257,9 +362,15 @@ function buildSummarySection({ chargeNeeded, chargerReachable, isFallback, confi
 
   const healthParams = { chargeNeeded, chargerReachable, isFallback, confidenceLevel, recommendationMode, energySection, batterySOC, userMinReserveSoc }
   const deductions = buildHealthDeductions(healthParams)
+  const stabilityResult = computeOperationStabilityScore({
+    chargeNeeded, chargerReachable, isFallback, confidenceLevel,
+    recommendationMode, energySection, batterySOC, userMinReserveSoc,
+    minRouteSocPct, recommendedCharger,
+  })
 
   return {
-    routeHealthScore: computeHealthScore(healthParams),
+    routeHealthScore: stabilityResult.score,
+    scoreBreakdown: stabilityResult.breakdown,
     healthDeductions: deductions,
     status,
     primaryAction,
@@ -291,6 +402,7 @@ export async function analyzeRoute({
   chargingResult,
   optimizationResult,
   userMinReserveSoc = 10,
+  minRouteSocPct = null,
 }) {
   const userProfile = getUserDrivingProfile(userId, vehicle?.id)
 
@@ -325,6 +437,8 @@ export async function analyzeRoute({
     energySection,
     batterySOC,
     userMinReserveSoc,
+    minRouteSocPct,
+    recommendedCharger: chargingResult?.recommendedCharger ?? null,
   })
 
   return {

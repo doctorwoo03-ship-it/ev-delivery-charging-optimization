@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { FONT } from '../theme/themes'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -5,8 +6,8 @@ import { FONT } from '../theme/themes'
 function SectionTitle({ children, T }) {
   return (
     <div style={{
-      fontSize: 10, fontWeight: 700, color: T.textSecondary,
-      textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10,
+      fontSize: 16, fontWeight: 700, color: T.textSecondary,
+      textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 18,
     }}>
       {children}
     </div>
@@ -14,14 +15,14 @@ function SectionTitle({ children, T }) {
 }
 
 function Divider({ T }) {
-  return <div style={{ height: 1, background: T.border, margin: '14px 0' }} />
+  return <div style={{ height: 1, background: T.border, margin: '28px 0' }} />
 }
 
 function Row({ label, value, valueColor, T }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '3px 0' }}>
-      <span style={{ fontSize: 12, color: T.textSecondary }}>{label}</span>
-      <span style={{ fontSize: 12, fontWeight: 600, color: valueColor ?? T.text }}>{value ?? '확인 필요'}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '9px 0' }}>
+      <span style={{ fontSize: 17, color: T.textSecondary }}>{label}</span>
+      <span style={{ fontSize: 17, fontWeight: 600, color: valueColor ?? T.text }}>{value ?? '확인 필요'}</span>
     </div>
   )
 }
@@ -31,35 +32,35 @@ function PenaltyTag({ amount, label, T }) {
   const isZero = amount === 0
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: 6,
-      padding: '4px 10px', borderRadius: 8, marginBottom: 4,
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: '10px 16px', borderRadius: 12, marginBottom: 8,
       background: isNeg ? `${T.danger}14` : isZero ? `${T.textSecondary}0a` : `${T.success}14`,
       border: `1px solid ${isNeg ? T.danger + '30' : isZero ? T.border : T.success + '30'}`,
     }}>
-      <span style={{ fontSize: 12, fontWeight: 700, color: isNeg ? T.danger : isZero ? T.textSecondary : T.success, minWidth: 36 }}>
+      <span style={{ fontSize: 17, fontWeight: 700, color: isNeg ? T.danger : isZero ? T.textSecondary : T.success, minWidth: 52 }}>
         {isNeg ? `${amount}점` : isZero ? '±0' : `+${amount}점`}
       </span>
-      <span style={{ fontSize: 12, color: T.text }}>{label}</span>
+      <span style={{ fontSize: 17, color: T.text }}>{label}</span>
     </div>
   )
 }
 
 function TSPStep({ num, text, result, isLast, T }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: isLast ? 0 : 6 }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: isLast ? 0 : 14 }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
         <div style={{
-          width: 22, height: 22, borderRadius: '50%',
+          width: 40, height: 40, borderRadius: '50%',
           background: `${T.accent}20`, border: `1.5px solid ${T.accent}60`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 10, fontWeight: 700, color: T.accent,
+          fontSize: 16, fontWeight: 700, color: T.accent,
         }}>{num}</div>
-        {!isLast && <div style={{ width: 1, height: 14, background: `${T.border}`, marginTop: 2 }} />}
+        {!isLast && <div style={{ width: 1, height: 28, background: `${T.border}`, marginTop: 3 }} />}
       </div>
-      <div style={{ flex: 1, paddingTop: 2 }}>
-        <div style={{ fontSize: 12, color: T.text, fontWeight: 500 }}>{text}</div>
+      <div style={{ flex: 1, paddingTop: 6 }}>
+        <div style={{ fontSize: 17, color: T.text, fontWeight: 600 }}>{text}</div>
         {result && (
-          <div style={{ fontSize: 11, color: T.textSecondary, marginTop: 1, lineHeight: 1.4 }}>{result}</div>
+          <div style={{ fontSize: 15, color: T.textSecondary, marginTop: 4, lineHeight: 1.55 }}>{result}</div>
         )}
       </div>
     </div>
@@ -85,6 +86,7 @@ function buildRecommendationExplanation({
   firstViolationLabel, chargePlan, minRouteSocPct,
 }) {
   const lines = []
+  let situationText = null
 
   if (overlayState === 'reserveWarning') {
     const rem = remainingSocAfterDelivery
@@ -104,6 +106,9 @@ function buildRecommendationExplanation({
       lines.push({ icon: 'ℹ', color: null, text: '배송 완주는 충전 없이도 가능합니다. 이 충전소를 선택 경유하면 안전 하한 SOC 기준을 충족할 수 있습니다.' })
     }
   } else if (overlayState === 'chargeNeeded') {
+    situationText = recommendationSource === 'mid-route'
+      ? '현재 배터리로 앞 배송지는 진행할 수 있지만, 다음 배송 구간에서 안전 하한 SOC 아래로 떨어질 수 있어 중간 충전을 권장해요.'
+      : '현재 배터리로 첫 배송을 시작하기 전에 안전 하한 SOC를 만족하기 어렵기 때문에 출발 전 충전을 권장해요.'
     lines.push({ icon: '!', color: 'danger', text: '현재 배터리로는 전체 배송을 완주할 수 없습니다.' })
     if (firstViolationLabel) {
       lines.push({ icon: '⚠', color: 'danger', text: `안전 하한 SOC 위반 구간: ${firstViolationLabel}` })
@@ -122,12 +127,13 @@ function buildRecommendationExplanation({
       const tgtSoc = chargePlan.targetSoc
       const powerKw = recommendedCharger?.powerKw
       lines.push({ icon: '⚡', color: 'accent', text: `권장 충전량: ${arrSoc}% → ${tgtSoc}% (약 ${chargePlan.chargeAmountKwh}kWh)` })
-      lines.push({ icon: 'ℹ', color: null, text: `예상 충전 시간: ${powerKw ? `${powerKw}kW 기준 ` : ''}약 ${chargePlan.chargeTimeMin}분 (대기 시간 미포함)` })
+      lines.push({ icon: 'ℹ', color: null, text: `예상 충전 시간: ${powerKw ? `${powerKw}kW 기준 ` : ''}약 ${chargePlan.chargeTimeMin}분` })
       lines.push({ icon: '✓', color: 'success', text: `충전 후 배송 완료 예상 SOC: ${chargePlan.finalDeliverySOC}% (안전 하한 이상)` })
     } else {
       lines.push({ icon: '✓', color: 'success', text: '충전 후 배송을 안전하게 완주할 수 있습니다.' })
     }
   } else if (overlayState === 'review-candidate') {
+    situationText = '충전 후보는 있지만 우회 거리나 위치 확인이 필요해요. 출발 전 실제 운영 상태를 확인해 주세요.'
     const isMidRoute = recommendationSource === 'mid-route'
     if (isMidRoute) {
       lines.push({ icon: 'ℹ', color: null, text: '배송 경로 중 충전이 필요할 수 있습니다.' })
@@ -154,6 +160,7 @@ function buildRecommendationExplanation({
     }
     lines.push({ icon: 'ℹ', color: null, text: '다른 출발 지점이나 충전 시점을 검토하거나, 후보 충전소를 직접 확인하세요.' })
   } else if (overlayState === 'predeparture-charge') {
+    situationText = '현재 배터리로 첫 배송을 시작하기 전에 안전 하한 SOC를 만족하기 어렵기 때문에 출발 전 충전을 권장해요.'
     lines.push({ icon: '!', color: 'danger', text: '현재 배터리가 안전 하한 SOC보다 낮습니다.' })
     if (firstViolationLabel) {
       lines.push({ icon: '⚠', color: 'danger', text: firstViolationLabel })
@@ -166,8 +173,8 @@ function buildRecommendationExplanation({
       lines.push({ icon: 'ℹ', color: null, text: '위치·출력·등록 충전기 수 기준 추천 · 실시간 사용 여부 확인 필요' })
     }
     lines.push({ icon: 'ℹ', color: null, text: `현재 SOC를 안전 하한 SOC ${userMinReserveSoc}% 이상으로 충전한 후 출발하세요.` })
-    lines.push({ icon: 'ℹ', color: null, text: '예상 충전 시간에 대기 시간은 미포함 · 대기 정보 미확인' })
   } else if (overlayState === 'canDeliver') {
+    situationText = '현재 배터리로 전체 배송을 완료해도 안전 하한 SOC 이상을 유지할 수 있어요.'
     lines.push({ icon: '✓', color: 'success', text: '현재 배터리로 전체 배송 경로를 완주할 수 있습니다.' })
     lines.push({ icon: '✓', color: 'success', text: '별도 충전 없이 모든 배송을 완료할 수 있습니다.' })
   } else if (overlayState === 'lowMargin') {
@@ -177,7 +184,7 @@ function buildRecommendationExplanation({
     lines.push({ icon: 'ℹ', color: null, text: '현재 상태를 확인하는 중입니다.' })
   }
 
-  return lines
+  return { lines, situationText }
 }
 
 // ── EV-TSP flow steps builder ─────────────────────────────────────────────────
@@ -291,17 +298,20 @@ export default function EVIntelligencePanel({
   T,
   themeName,
 }) {
+  const [selectedChargerIdx, setSelectedChargerIdx] = useState(null)
+  const [hoveredIdx, setHoveredIdx] = useState(null)
+
   if (!open) return null
 
   const bgColor = themeName === 'dark' ? 'rgba(17,19,23,0.98)' : 'rgba(255,255,255,0.99)'
-  const healthScore = intel?.summary?.routeHealthScore ?? null
-  const deductions = intel?.summary?.healthDeductions ?? []
-  const healthGrade = healthScore == null ? null : healthScore >= 80 ? '양호' : healthScore >= 60 ? '주의' : '위험'
-  const healthColor = healthScore == null ? T.textSecondary : healthScore >= 80 ? T.success : healthScore >= 60 ? T.warning : T.danger
+  const healthScore    = intel?.summary?.routeHealthScore ?? null
+  const scoreBreakdown = intel?.summary?.scoreBreakdown ?? []
+  const healthGrade = healthScore == null ? null : healthScore >= 85 ? '안정' : healthScore >= 70 ? '양호' : healthScore >= 50 ? '주의' : '위험'
+  const healthColor = healthScore == null ? T.textSecondary : healthScore >= 85 ? T.success : healthScore >= 70 ? T.accent : healthScore >= 50 ? T.warning : T.danger
 
   const top5 = (scoredChargers ?? []).slice(0, 5)
 
-  const explanationLines = buildRecommendationExplanation({
+  const { lines: explanationLines, situationText: explanationSituationText } = buildRecommendationExplanation({
     overlayState, recommendedCharger, recommendationMode, recommendationSource,
     insertionExplanation, remainingSocAfterDelivery, userMinReserveSoc,
     nearestRejectedDepartureChargerName, nearestRejectedDepartureDistanceKm,
@@ -316,7 +326,7 @@ export default function EVIntelligencePanel({
 
   return (
     <div style={{
-      width: 440,
+      width: 'clamp(580px, 46vw, 820px)',
       flexShrink: 0,
       height: '100%',
       overflow: 'hidden',
@@ -328,22 +338,22 @@ export default function EVIntelligencePanel({
 
         {/* Header */}
         <div style={{
-          padding: '14px 16px', borderBottom: `1px solid ${T.border}`,
+          padding: '22px 30px', borderBottom: `1px solid ${T.border}`,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           flexShrink: 0, background: T.surface,
         }}>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 5 }}>
               EV 인텔리전스 상세
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>판단 근거 보기</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: T.text }}>판단 근거 보기</div>
           </div>
           <button
             onClick={onClose}
             style={{
-              width: 32, height: 32, borderRadius: '50%',
+              width: 44, height: 44, borderRadius: '50%',
               border: `1px solid ${T.border}`, background: T.surfaceSecondary,
-              color: T.textSecondary, fontSize: 16, cursor: 'pointer',
+              color: T.textSecondary, fontSize: 20, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: FONT,
             }}
@@ -351,17 +361,17 @@ export default function EVIntelligencePanel({
         </div>
 
         {/* Scrollable body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '28px' }}>
 
             {/* Loading banner */}
           {deliveryRouteStatus === 'loading' && (
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              padding: '8px 12px', borderRadius: 8, marginBottom: 12,
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '12px 16px', borderRadius: 10, marginBottom: 16,
               background: `${T.accent}12`, border: `1px solid ${T.accent}30`,
             }}>
-              <span style={{ fontSize: 13, color: T.accent }}>⟳</span>
-              <span style={{ fontSize: 12, color: T.accent, fontWeight: 500 }}>
+              <span style={{ fontSize: 17, color: T.accent }}>⟳</span>
+              <span style={{ fontSize: 15, color: T.accent, fontWeight: 500 }}>
                 실제 도로 경로를 불러오는 중… 아래 수치는 임시 예측값입니다.
               </span>
             </div>
@@ -372,19 +382,19 @@ export default function EVIntelligencePanel({
 
           {statusCfg && (
             <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '5px 12px', borderRadius: 20, marginBottom: 12,
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              padding: '13px 24px', borderRadius: 28, marginBottom: 20,
               background: `${statusCfg.color}18`,
               border: `1px solid ${statusCfg.color}40`,
             }}>
-              <span style={{ fontSize: 14 }}>{statusCfg.icon}</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: statusCfg.color }}>{statusCfg.label}</span>
+              <span style={{ fontSize: 22 }}>{statusCfg.icon}</span>
+              <span style={{ fontSize: 20, fontWeight: 700, color: statusCfg.color }}>{statusCfg.label}</span>
             </div>
           )}
 
           <div style={{
-            background: T.surface, borderRadius: 10, border: `1px solid ${T.border}`,
-            padding: '10px 12px', marginBottom: 4,
+            background: T.surface, borderRadius: 12, border: `1px solid ${T.border}`,
+            padding: '18px 22px', marginBottom: 4,
           }}>
             <Row label="현재 배터리" value={`${soc}%`} T={T} />
             <Row label="현재 주행 가능 거리" value={`${estimatedRangeKm}km`} T={T} />
@@ -433,63 +443,77 @@ export default function EVIntelligencePanel({
 
           <Divider T={T} />
 
-          {/* ── Section 2: 경로 건강 점수 ───────────────────────────────── */}
-          <SectionTitle T={T}>경로 건강 점수</SectionTitle>
+          {/* ── Section 2: 배송·충전 안정도 ──────────────────────────────── */}
+          <SectionTitle T={T}>배송·충전 안정도</SectionTitle>
 
           {healthScore != null ? (
-            <div style={{ background: T.surface, borderRadius: 10, border: `1px solid ${T.border}`, padding: '12px 12px', marginBottom: 4 }}>
+            <div style={{ background: T.surface, borderRadius: 12, border: `1px solid ${T.border}`, padding: '22px 26px', marginBottom: 4 }}>
               {/* Score bar */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                <div style={{ flex: 1, height: 8, background: T.border, borderRadius: 4, overflow: 'hidden' }}>
-                  <div style={{ width: `${healthScore}%`, background: healthColor, height: '100%', borderRadius: 4 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 8 }}>
+                <div style={{ flex: 1, height: 16, background: T.border, borderRadius: 8, overflow: 'hidden' }}>
+                  <div style={{ width: `${healthScore}%`, background: healthColor, height: '100%', borderRadius: 8 }} />
                 </div>
-                <span style={{ fontSize: 20, fontWeight: 700, color: healthColor, minWidth: 48, textAlign: 'right' }}>
+                <span style={{ fontSize: 46, fontWeight: 700, color: healthColor, minWidth: 76, textAlign: 'right' }}>
                   {healthScore}
                 </span>
               </div>
-              <div style={{ fontSize: 11, color: T.textSecondary, marginBottom: 10 }}>
-                {healthGrade} 등급 / 100점 만점
+              <div style={{ fontSize: 16, color: T.textSecondary, marginBottom: 18 }}>
+                {healthGrade} · 100점 만점 — 85점 이상: 안정 · 70–84점: 양호 · 50–69점: 주의 · 50점 미만: 위험
               </div>
 
-              {/* Formula */}
+              {/* Explanation */}
               <div style={{
-                fontSize: 11, color: T.textSecondary, lineHeight: 1.6,
-                padding: '7px 10px', borderRadius: 7,
+                fontSize: 15, color: T.textSecondary, lineHeight: 1.7,
+                padding: '12px 16px', borderRadius: 10,
                 background: `${T.textSecondary}0a`, border: `1px solid ${T.border}`,
-                marginBottom: 10,
+                marginBottom: 18,
               }}>
-                <strong style={{ color: T.text }}>점수 구성:</strong>{' '}
-                기본점수 100 — 배터리 위험 패널티 — 충전 필요 패널티 — 경로 신뢰도 패널티
+                배터리 여유, 충전 필요도, 우회거리, 충전소 신뢰도를 함께 반영한 점수예요.
               </div>
 
-              {/* Base */}
-              <PenaltyTag amount={100} label="기본 점수" T={T} />
-              {deductions.map((d, i) => (
-                <PenaltyTag key={i} amount={d.amount} label={d.label} T={T} />
-              ))}
-              {deductions.length === 0 && (
-                <div style={{ fontSize: 12, color: T.textSecondary }}>감점 없음 — 최적 상태</div>
+              {/* Breakdown title */}
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
+                운행 안정도 계산 기준
+              </div>
+
+              {/* Breakdown rows */}
+              {scoreBreakdown.length > 0 ? scoreBreakdown.map((item, i) => {
+                const ratio = item.max > 0 ? item.earned / item.max : 0
+                const itemColor = ratio >= 0.85 ? T.success : ratio >= 0.6 ? T.accent : ratio >= 0.4 ? T.warning : T.danger
+                return (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, paddingBottom: 12, marginBottom: 12, borderBottom: i < scoreBreakdown.length - 1 ? `1px solid ${T.border}40` : 'none' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 15, fontWeight: 500, color: T.text, marginBottom: 5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</div>
+                      <div style={{ height: 6, background: T.border, borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: `${ratio * 100}%`, background: itemColor, height: '100%', borderRadius: 3, transition: 'width 0.3s' }} />
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right', minWidth: 68, flexShrink: 0 }}>
+                      <span style={{ fontSize: 17, fontWeight: 700, color: itemColor }}>+{item.earned}</span>
+                      <span style={{ fontSize: 13, color: T.textSecondary }}> / {item.max}</span>
+                    </div>
+                  </div>
+                )
+              }) : (
+                <div style={{ fontSize: 15, color: T.textSecondary }}>세부 항목을 계산하는 중이에요.</div>
               )}
 
-              <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${T.border}` }}>
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${T.border}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                  <span style={{ fontSize: 12, color: T.textSecondary }}>최종 점수</span>
-                  <span style={{ fontSize: 18, fontWeight: 700, color: healthColor }}>{healthScore}점</span>
-                </div>
-                <div style={{ fontSize: 11, color: T.textSecondary, marginTop: 2 }}>
-                  80점 이상: 양호 · 60–79점: 주의 · 60점 미만: 위험
+                  <span style={{ fontSize: 17, color: T.textSecondary }}>운행 안정도</span>
+                  <span style={{ fontSize: 34, fontWeight: 700, color: healthColor }}>{healthScore}점</span>
                 </div>
               </div>
             </div>
           ) : (
-            <div style={{ fontSize: 12, color: T.textSecondary, padding: '8px 0' }}>경로 건강 점수를 계산하는 중입니다.</div>
+            <div style={{ fontSize: 17, color: T.textSecondary, padding: '14px 0' }}>운행 안정도를 계산하는 중이에요.</div>
           )}
 
           <Divider T={T} />
 
           {/* ── Section 3: EV-TSP 판단 과정 ──────────────────────────────── */}
           <SectionTitle T={T}>EV-TSP 판단 과정</SectionTitle>
-          <div style={{ background: T.surface, borderRadius: 10, border: `1px solid ${T.border}`, padding: '12px 12px', marginBottom: 4 }}>
+          <div style={{ background: T.surface, borderRadius: 12, border: `1px solid ${T.border}`, padding: '20px 24px', marginBottom: 4 }}>
             {tspSteps.map((step, i) => (
               <TSPStep
                 key={i}
@@ -506,7 +530,12 @@ export default function EVIntelligencePanel({
 
           {/* ── Section 4: 충전 판단 근거 ──────────────────────────────────── */}
           <SectionTitle T={T}>충전 판단 근거</SectionTitle>
-          <div style={{ background: T.surface, borderRadius: 10, border: `1px solid ${T.border}`, padding: '10px 12px', marginBottom: 4 }}>
+          {explanationSituationText && (
+            <div style={{ padding: '14px 18px', borderRadius: 12, background: `${T.accent}0f`, border: `1px solid ${T.accent}30`, fontSize: 17, color: T.text, lineHeight: 1.8, marginBottom: 16, fontWeight: 500 }}>
+              {explanationSituationText}
+            </div>
+          )}
+          <div style={{ background: T.surface, borderRadius: 12, border: `1px solid ${T.border}`, padding: '18px 22px', marginBottom: 4 }}>
             {explanationLines.map((line, i) => {
               const iconColor = line.color === 'success' ? T.success
                 : line.color === 'warning' ? T.warning
@@ -515,14 +544,14 @@ export default function EVIntelligencePanel({
                 : T.textSecondary
               return (
                 <div key={i} style={{
-                  display: 'flex', alignItems: 'flex-start', gap: 8,
-                  padding: '5px 0',
+                  display: 'flex', alignItems: 'flex-start', gap: 12,
+                  padding: '12px 0',
                   borderBottom: i < explanationLines.length - 1 ? `1px solid ${T.border}44` : 'none',
                 }}>
-                  <span style={{ fontSize: 13, color: iconColor, flexShrink: 0, minWidth: 16, textAlign: 'center', lineHeight: 1.5 }}>
+                  <span style={{ fontSize: 18, color: iconColor, flexShrink: 0, minWidth: 22, textAlign: 'center', lineHeight: 1.5 }}>
                     {line.icon}
                   </span>
-                  <span style={{ fontSize: 12, color: T.text, lineHeight: 1.55 }}>{line.text}</span>
+                  <span style={{ fontSize: 17, color: T.text, lineHeight: 1.7 }}>{line.text}</span>
                 </div>
               )
             })}
@@ -532,77 +561,195 @@ export default function EVIntelligencePanel({
 
           {/* ── Section 5: 충전소 후보 Top 5 ──────────────────────────────── */}
           <SectionTitle T={T}>충전소 후보 Top 5</SectionTitle>
+          <div style={{ fontSize: 14, color: T.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>
+            ★ 표시는 EV-TSP 스코어링으로 선정된 최종 권장 충전소예요. 후보 번호는 스코어 순서이므로 권장 충전소가 항상 1번이 아닐 수 있어요.
+          </div>
 
           {top5.length > 0 ? (
-            <div style={{ background: T.surface, borderRadius: 10, border: `1px solid ${T.border}`, overflow: 'hidden' }}>
-              {/* Table header */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '28px 1fr 56px 56px 40px 64px',
-                gap: 0, padding: '6px 10px',
-                background: `${T.textSecondary}10`,
-                borderBottom: `1px solid ${T.border}`,
-              }}>
-                {['순위', '충전소', '거리', '우회', 'kW', '판단'].map(h => (
-                  <div key={h} style={{ fontSize: 9, fontWeight: 700, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                    {h}
-                  </div>
-                ))}
-              </div>
-
-              {top5.map((c, i) => {
+            <>
+              {/* 충전소 상세 팝업 (행 클릭 시 표시) */}
+              {selectedChargerIdx !== null && top5[selectedChargerIdx] && (() => {
+                const c = top5[selectedChargerIdx]
                 const ql = chargerQualityLabel(c, recommendedCharger?.id)
                 const distKm = c.originToChargerKm ?? c.distanceFromStartKm ?? null
                 const detourKm = c.insertionDetourKm ?? null
                 const isRec = c.id && c.id === recommendedCharger?.id
                 return (
-                  <div
-                    key={c.id ?? i}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '28px 1fr 56px 56px 40px 64px',
-                      gap: 0, padding: '7px 10px', alignItems: 'center',
-                      borderBottom: i < top5.length - 1 ? `1px solid ${T.border}44` : 'none',
-                      background: isRec ? `${T.accent}0a` : 'transparent',
-                    }}
-                  >
-                    <div style={{ fontSize: 12, fontWeight: 700, color: isRec ? T.accent : T.textSecondary }}>
-                      {i + 1}
+                  <div style={{
+                    marginBottom: 16,
+                    background: isRec ? `${T.accent}0d` : T.bg,
+                    border: `2px solid ${isRec ? T.accent + '60' : ql.color + '50'}`,
+                    borderRadius: 14,
+                    padding: '18px 22px',
+                    position: 'relative',
+                  }}>
+                    <button
+                      onClick={() => setSelectedChargerIdx(null)}
+                      style={{
+                        position: 'absolute', top: 12, right: 12,
+                        width: 34, height: 34, borderRadius: '50%',
+                        border: `1px solid ${T.border}`, background: T.surfaceSecondary,
+                        color: T.textSecondary, fontSize: 18, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: FONT, lineHeight: 1,
+                      }}
+                    >×</button>
+
+                    <span style={{
+                      display: 'inline-block',
+                      fontSize: 14, fontWeight: 700,
+                      padding: '5px 14px', borderRadius: 20, marginBottom: 12,
+                      background: `${ql.color}18`,
+                      border: `1px solid ${ql.color}40`,
+                      color: ql.color,
+                    }}>{ql.text}</span>
+
+                    <div style={{ fontSize: 22, fontWeight: 700, color: T.text, marginBottom: 4, paddingRight: 44 }}>
+                      {c.name ?? '—'}
                     </div>
-                    <div style={{ overflow: 'hidden' }}>
-                      <div style={{
-                        fontSize: 12, fontWeight: isRec ? 700 : 500, color: T.text,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>{c.name ?? '확인 필요'}</div>
-                      {c.operator && (
-                        <div style={{ fontSize: 10, color: T.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.operator}</div>
+                    {c.operator && (
+                      <div style={{ fontSize: 16, color: T.textSecondary, marginBottom: isRec ? 12 : 16 }}>{c.operator}</div>
+                    )}
+
+                    {isRec && (
+                      <div style={{ marginBottom: 16, padding: '14px 18px', background: `${T.accent}10`, border: `1px solid ${T.accent}30`, borderRadius: 12 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>선정 이유</div>
+                        <div style={{ fontSize: 15, color: T.text, lineHeight: 1.75 }}>
+                          <div>현재 배터리와 안전 하한 SOC를 기준으로 충전이 필요한 상황이에요.</div>
+                          <div style={{ marginTop: 6 }}>이 충전소는 현재 위치에서 도달 가능하고, 충전 후 남은 배송을 안전 하한 SOC 이상으로 이어갈 수 있어요.</div>
+                          <div style={{ marginTop: 6 }}>단순 거리만이 아니라 우회 거리, 충전 시점, 안전 하한 SOC 충족 여부를 함께 고려했어요.</div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+                      {c.powerKw != null && (
+                        <div style={{ background: T.surface, borderRadius: 10, padding: '12px 16px', border: `1px solid ${T.border}` }}>
+                          <div style={{ fontSize: 13, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>충전 속도</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: T.text }}>{c.powerKw} kW</div>
+                        </div>
+                      )}
+                      {distKm != null && (
+                        <div style={{ background: T.surface, borderRadius: 10, padding: '12px 16px', border: `1px solid ${T.border}` }}>
+                          <div style={{ fontSize: 13, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>거리</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: T.text }}>{distKm} km</div>
+                        </div>
+                      )}
+                      {detourKm != null && (
+                        <div style={{ background: T.surface, borderRadius: 10, padding: '12px 16px', border: `1px solid ${T.border}` }}>
+                          <div style={{ fontSize: 13, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>우회 거리</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: T.text }}>{detourKm.toFixed(1)} km</div>
+                        </div>
+                      )}
+                      {c.pricePerKwh != null && (
+                        <div style={{ background: T.surface, borderRadius: 10, padding: '12px 16px', border: `1px solid ${T.border}` }}>
+                          <div style={{ fontSize: 13, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>단가</div>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: T.text }}>{c.pricePerKwh.toLocaleString('ko-KR')}원/kWh</div>
+                        </div>
                       )}
                     </div>
-                    <div style={{ fontSize: 11, color: T.textSecondary }}>
-                      {distKm != null ? `${distKm}km` : '—'}
-                    </div>
-                    <div style={{ fontSize: 11, color: T.textSecondary }}>
-                      {detourKm != null ? `${detourKm.toFixed(1)}km` : '—'}
-                    </div>
-                    <div style={{ fontSize: 11, color: T.text, fontWeight: 600 }}>
-                      {c.powerKw != null ? c.powerKw : '—'}
-                    </div>
-                    <div>
-                      <span style={{
-                        fontSize: 10, padding: '2px 6px', borderRadius: 8,
-                        background: `${ql.color}18`,
-                        border: `1px solid ${ql.color}40`,
-                        color: ql.color, fontWeight: 600, whiteSpace: 'nowrap',
-                      }}>
-                        {ql.text}
-                      </span>
+
+                    <div style={{
+                      padding: '13px 18px', background: `${ql.color}14`,
+                      borderRadius: 10, border: `1px solid ${ql.color}30`,
+                      fontSize: 16, fontWeight: 700, color: ql.color, textAlign: 'center',
+                    }}>
+                      판단: {ql.text}
                     </div>
                   </div>
                 )
-              })}
-            </div>
+              })()}
+
+              <div style={{ background: T.surface, borderRadius: 12, border: `1px solid ${T.border}`, overflow: 'hidden' }}>
+                {/* Table header */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '44px 1fr 86px 86px 64px 108px',
+                  gap: 0, padding: '14px 18px',
+                  background: `${T.textSecondary}10`,
+                  borderBottom: `1px solid ${T.border}`,
+                }}>
+                  {['후보', '충전소', '거리', '우회', 'kW', '판단'].map(h => (
+                    <div key={h} style={{ fontSize: 14, fontWeight: 700, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                      {h}
+                    </div>
+                  ))}
+                </div>
+
+                {top5.map((c, i) => {
+                  const ql = chargerQualityLabel(c, recommendedCharger?.id)
+                  const distKm = c.originToChargerKm ?? c.distanceFromStartKm ?? null
+                  const detourKm = c.insertionDetourKm ?? null
+                  const isRec = c.id && c.id === recommendedCharger?.id
+                  const isSelected = selectedChargerIdx === i
+                  const isHovered = hoveredIdx === i
+                  return (
+                    <div
+                      key={c.id ?? i}
+                      onClick={() => setSelectedChargerIdx(prev => prev === i ? null : i)}
+                      onMouseEnter={() => setHoveredIdx(i)}
+                      onMouseLeave={() => setHoveredIdx(null)}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '44px 1fr 86px 86px 64px 108px',
+                        gap: 0, padding: '16px 18px', alignItems: 'center',
+                        borderBottom: i < top5.length - 1 ? `1px solid ${T.border}44` : 'none',
+                        background: isSelected
+                          ? `${T.accent}18`
+                          : isHovered
+                            ? `${T.textSecondary}08`
+                            : isRec ? `${T.accent}1c` : 'transparent',
+                        cursor: 'pointer',
+                        transition: 'background 0.12s',
+                        outline: isSelected ? `2px solid ${T.accent}50` : isRec ? `1px solid ${T.accent}40` : 'none',
+                        outlineOffset: '-2px',
+                        boxShadow: isRec ? `inset 4px 0 0 ${T.accent}` : 'none',
+                      }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                        {isRec && (
+                          <span style={{ fontSize: 10, color: T.accent, lineHeight: 1 }}>★</span>
+                        )}
+                        <span style={{ fontSize: 16, fontWeight: 700, color: isRec ? T.accent : T.textSecondary }}>
+                          {i + 1}
+                        </span>
+                      </div>
+                      <div style={{ overflow: 'hidden' }}>
+                        <div style={{
+                          fontSize: 17, fontWeight: isRec || isSelected ? 700 : 500,
+                          color: isSelected ? T.accent : T.text,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>{c.name ?? '확인 필요'}</div>
+                        {c.operator && (
+                          <div style={{ fontSize: 14, color: T.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.operator}</div>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 16, color: T.textSecondary }}>
+                        {distKm != null ? `${distKm}km` : '—'}
+                      </div>
+                      <div style={{ fontSize: 16, color: T.textSecondary }}>
+                        {detourKm != null ? `${detourKm.toFixed(1)}km` : '—'}
+                      </div>
+                      <div style={{ fontSize: 16, color: T.text, fontWeight: 600 }}>
+                        {c.powerKw != null ? c.powerKw : '—'}
+                      </div>
+                      <div>
+                        <span style={{
+                          fontSize: 14, padding: '5px 12px', borderRadius: 10,
+                          background: `${ql.color}18`,
+                          border: `1px solid ${ql.color}40`,
+                          color: ql.color, fontWeight: 600, whiteSpace: 'nowrap',
+                        }}>
+                          {ql.text}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
           ) : (
-            <div style={{ fontSize: 12, color: T.textSecondary, padding: '8px 0' }}>
+            <div style={{ fontSize: 17, color: T.textSecondary, padding: '14px 0' }}>
               {scoredChargers == null ? '충전소 데이터를 불러오는 중입니다.' : '표시할 충전소 후보가 없습니다.'}
             </div>
           )}
