@@ -1277,8 +1277,10 @@ export default function IndexPage() {
             border: `1px solid ${CLR.hairline}`,
             maxWidth: 1220, margin: '0 auto',
           }}>
-            <div style={{ flex: '1 1 64%', minWidth: 0, height: 364, position: 'relative', background: '#131929', overflow: 'hidden' }}>
-              <RouteMockup />
+            <div style={{ flex: '1 1 64%', minWidth: 0, minHeight: 364, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', inset: 0, background: '#131929' }}>
+                <RouteMockup />
+              </div>
             </div>
             <div style={{ flex: '1 1 36%', minWidth: 200, background: CLR.parchment, padding: '23px 27px', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `1px solid ${CLR.hairline}` }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: CLR.primary, fontFamily: TEXT, letterSpacing: '0.10em', textTransform: 'uppercase', marginBottom: 7 }}>
