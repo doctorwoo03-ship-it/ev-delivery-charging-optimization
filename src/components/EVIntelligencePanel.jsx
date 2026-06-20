@@ -326,7 +326,7 @@ export default function EVIntelligencePanel({
 
   return (
     <div style={{
-      width: 'clamp(580px, 46vw, 820px)',
+      width: '100%',
       flexShrink: 0,
       height: '100%',
       overflow: 'hidden',
@@ -361,7 +361,7 @@ export default function EVIntelligencePanel({
         </div>
 
         {/* Scrollable body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '28px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
 
             {/* Loading banner */}
           {deliveryRouteStatus === 'loading' && (
@@ -561,8 +561,8 @@ export default function EVIntelligencePanel({
 
           {/* ── Section 5: 충전소 후보 Top 5 ──────────────────────────────── */}
           <SectionTitle T={T}>충전소 후보 Top 5</SectionTitle>
-          <div style={{ fontSize: 14, color: T.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>
-            ★ 표시는 EV-TSP 스코어링으로 선정된 최종 권장 충전소예요. 후보 번호는 스코어 순서이므로 권장 충전소가 항상 1번이 아닐 수 있어요.
+          <div style={{ fontSize: 12, color: T.textSecondary, lineHeight: 1.6, marginBottom: 12 }}>
+            ★ 표시는 EV-TSP 스코어링으로 선정된 최종 권장 충전소예요. 행을 클릭하면 상세 정보를 볼 수 있어요.
           </div>
 
           {top5.length > 0 ? (
@@ -576,11 +576,11 @@ export default function EVIntelligencePanel({
                 const isRec = c.id && c.id === recommendedCharger?.id
                 return (
                   <div style={{
-                    marginBottom: 16,
+                    marginBottom: 14,
                     background: isRec ? `${T.accent}0d` : T.bg,
                     border: `2px solid ${isRec ? T.accent + '60' : ql.color + '50'}`,
-                    borderRadius: 14,
-                    padding: '18px 22px',
+                    borderRadius: 12,
+                    padding: '14px 16px',
                     position: 'relative',
                   }}>
                     <button
@@ -604,11 +604,11 @@ export default function EVIntelligencePanel({
                       color: ql.color,
                     }}>{ql.text}</span>
 
-                    <div style={{ fontSize: 22, fontWeight: 700, color: T.text, marginBottom: 4, paddingRight: 44 }}>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: T.text, marginBottom: 3, paddingRight: 40, wordBreak: 'keep-all', lineHeight: 1.35 }}>
                       {c.name ?? '—'}
                     </div>
                     {c.operator && (
-                      <div style={{ fontSize: 16, color: T.textSecondary, marginBottom: isRec ? 12 : 16 }}>{c.operator}</div>
+                      <div style={{ fontSize: 14, color: T.textSecondary, marginBottom: isRec ? 10 : 12 }}>{c.operator}</div>
                     )}
 
                     {isRec && (
@@ -624,27 +624,27 @@ export default function EVIntelligencePanel({
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
                       {c.powerKw != null && (
-                        <div style={{ background: T.surface, borderRadius: 10, padding: '12px 16px', border: `1px solid ${T.border}` }}>
-                          <div style={{ fontSize: 13, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>충전 속도</div>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: T.text }}>{c.powerKw} kW</div>
+                        <div style={{ background: T.surface, borderRadius: 10, padding: '10px 12px', border: `1px solid ${T.border}` }}>
+                          <div style={{ fontSize: 11, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>충전 속도</div>
+                          <div style={{ fontSize: 18, fontWeight: 700, color: T.text }}>{c.powerKw} kW</div>
                         </div>
                       )}
                       {distKm != null && (
-                        <div style={{ background: T.surface, borderRadius: 10, padding: '12px 16px', border: `1px solid ${T.border}` }}>
-                          <div style={{ fontSize: 13, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>거리</div>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: T.text }}>{distKm} km</div>
+                        <div style={{ background: T.surface, borderRadius: 10, padding: '10px 12px', border: `1px solid ${T.border}` }}>
+                          <div style={{ fontSize: 11, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>거리</div>
+                          <div style={{ fontSize: 18, fontWeight: 700, color: T.text }}>{distKm} km</div>
                         </div>
                       )}
                       {detourKm != null && (
-                        <div style={{ background: T.surface, borderRadius: 10, padding: '12px 16px', border: `1px solid ${T.border}` }}>
-                          <div style={{ fontSize: 13, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>우회 거리</div>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: T.text }}>{detourKm.toFixed(1)} km</div>
+                        <div style={{ background: T.surface, borderRadius: 10, padding: '10px 12px', border: `1px solid ${T.border}` }}>
+                          <div style={{ fontSize: 11, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>우회 거리</div>
+                          <div style={{ fontSize: 18, fontWeight: 700, color: T.text }}>{detourKm.toFixed(1)} km</div>
                         </div>
                       )}
                       {c.pricePerKwh != null && (
-                        <div style={{ background: T.surface, borderRadius: 10, padding: '12px 16px', border: `1px solid ${T.border}` }}>
-                          <div style={{ fontSize: 13, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>단가</div>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: T.text }}>{c.pricePerKwh.toLocaleString('ko-KR')}원/kWh</div>
+                        <div style={{ background: T.surface, borderRadius: 10, padding: '10px 12px', border: `1px solid ${T.border}` }}>
+                          <div style={{ fontSize: 11, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>단가</div>
+                          <div style={{ fontSize: 18, fontWeight: 700, color: T.text }}>{c.pricePerKwh.toLocaleString('ko-KR')}원/kWh</div>
                         </div>
                       )}
                     </div>
@@ -664,13 +664,13 @@ export default function EVIntelligencePanel({
                 {/* Table header */}
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: '44px 1fr 86px 86px 64px 108px',
-                  gap: 0, padding: '14px 18px',
+                  gridTemplateColumns: '26px 1fr 52px 44px 68px',
+                  gap: 0, padding: '9px 14px',
                   background: `${T.textSecondary}10`,
                   borderBottom: `1px solid ${T.border}`,
                 }}>
-                  {['후보', '충전소', '거리', '우회', 'kW', '판단'].map(h => (
-                    <div key={h} style={{ fontSize: 14, fontWeight: 700, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                  {['#', '충전소', '거리', 'kW', '판단'].map(h => (
+                    <div key={h} style={{ fontSize: 11, fontWeight: 700, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       {h}
                     </div>
                   ))}
@@ -679,7 +679,6 @@ export default function EVIntelligencePanel({
                 {top5.map((c, i) => {
                   const ql = chargerQualityLabel(c, recommendedCharger?.id)
                   const distKm = c.originToChargerKm ?? c.distanceFromStartKm ?? null
-                  const detourKm = c.insertionDetourKm ?? null
                   const isRec = c.id && c.id === recommendedCharger?.id
                   const isSelected = selectedChargerIdx === i
                   const isHovered = hoveredIdx === i
@@ -691,8 +690,8 @@ export default function EVIntelligencePanel({
                       onMouseLeave={() => setHoveredIdx(null)}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '44px 1fr 86px 86px 64px 108px',
-                        gap: 0, padding: '16px 18px', alignItems: 'center',
+                        gridTemplateColumns: '26px 1fr 52px 44px 68px',
+                        gap: 0, padding: '10px 14px', alignItems: 'start',
                         borderBottom: i < top5.length - 1 ? `1px solid ${T.border}44` : 'none',
                         background: isSelected
                           ? `${T.accent}18`
@@ -706,39 +705,38 @@ export default function EVIntelligencePanel({
                         boxShadow: isRec ? `inset 4px 0 0 ${T.accent}` : 'none',
                       }}
                     >
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1, paddingTop: 2 }}>
                         {isRec && (
-                          <span style={{ fontSize: 10, color: T.accent, lineHeight: 1 }}>★</span>
+                          <span style={{ fontSize: 9, color: T.accent, lineHeight: 1 }}>★</span>
                         )}
-                        <span style={{ fontSize: 16, fontWeight: 700, color: isRec ? T.accent : T.textSecondary }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: isRec ? T.accent : T.textSecondary }}>
                           {i + 1}
                         </span>
                       </div>
-                      <div style={{ overflow: 'hidden' }}>
+                      <div style={{ overflow: 'hidden', paddingRight: 4 }}>
                         <div style={{
-                          fontSize: 17, fontWeight: isRec || isSelected ? 700 : 500,
+                          fontSize: 13, fontWeight: isRec || isSelected ? 700 : 500,
                           color: isSelected ? T.accent : T.text,
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden', lineHeight: 1.4, wordBreak: 'keep-all',
                         }}>{c.name ?? '확인 필요'}</div>
                         {c.operator && (
-                          <div style={{ fontSize: 14, color: T.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.operator}</div>
+                          <div style={{ fontSize: 11, color: T.textSecondary, marginTop: 2, lineHeight: 1.3 }}>{c.operator}</div>
                         )}
                       </div>
-                      <div style={{ fontSize: 16, color: T.textSecondary }}>
+                      <div style={{ fontSize: 12, color: T.textSecondary, paddingTop: 2 }}>
                         {distKm != null ? `${distKm}km` : '—'}
                       </div>
-                      <div style={{ fontSize: 16, color: T.textSecondary }}>
-                        {detourKm != null ? `${detourKm.toFixed(1)}km` : '—'}
-                      </div>
-                      <div style={{ fontSize: 16, color: T.text, fontWeight: 600 }}>
+                      <div style={{ fontSize: 12, color: T.text, fontWeight: 600, paddingTop: 2 }}>
                         {c.powerKw != null ? c.powerKw : '—'}
                       </div>
-                      <div>
+                      <div style={{ paddingTop: 1 }}>
                         <span style={{
-                          fontSize: 14, padding: '5px 12px', borderRadius: 10,
+                          fontSize: 11, padding: '3px 7px', borderRadius: 8,
                           background: `${ql.color}18`,
                           border: `1px solid ${ql.color}40`,
                           color: ql.color, fontWeight: 600, whiteSpace: 'nowrap',
+                          display: 'inline-block',
                         }}>
                           {ql.text}
                         </span>

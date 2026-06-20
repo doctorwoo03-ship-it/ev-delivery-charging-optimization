@@ -80,20 +80,20 @@ const defaultStartPoint = { id: 'depot', name: depot.name, lat: depot.lat, lng: 
 const EMPTY_CUSTOM = { name: '', batteryCapacityKwh: '', maxRangeKm: '', efficiencyKmPerKwh: '' }
 const EMPTY_FORM = { name: '', lat: '', lng: '', address: '' }
 
-const OUTER_HDR = 52
-const HDR = 56
-const BAR = 96
+const OUTER_HDR = 36
+const HDR = 28
+const BAR = 60
 const HMI = {
   text: {
-    micro:      'clamp(13px, 1.4vh, 17px)',
-    caption:    'clamp(15px, 1.7vh, 20px)',
-    body:       'clamp(17px, 2.0vh, 24px)',
-    bodyStrong: 'clamp(19px, 2.3vh, 28px)',
-    title:      'clamp(22px, 2.6vh, 32px)',
-    metric:     'clamp(60px, 7.0vh, 88px)',
-    metricUnit: 'clamp(22px, 2.6vh, 34px)',
+    micro:      'clamp(10px, 1.2vh, 13px)',
+    caption:    'clamp(14px, 1.8vh, 18px)',
+    body:       'clamp(16px, 2.0vh, 22px)',
+    bodyStrong: 'clamp(18px, 2.2vh, 26px)',
+    title:      'clamp(20px, 2.5vh, 28px)',
+    metric:     'clamp(48px, 5.5vh, 66px)',
+    metricUnit: 'clamp(18px, 2.2vh, 26px)',
   },
-  touch: { small: 48, normal: 56 },
+  touch: { small: 36, normal: 46 },
 }
 
 // ── Helper components ─────────────────────────────────────────────────────────
@@ -960,7 +960,7 @@ export default function MVP8Page() {
 
           {/* Scrollable step content */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
-            <div style={{ maxWidth: 1040, margin: '0 auto', padding: '24px 24px 40px' }}>
+            <div style={{ maxWidth: 820, margin: '0 auto', padding: '16px 20px 28px' }}>
 
               {/* ── STEP 1: Vehicle selection ──────────────────────────────── */}
               {step === 1 && (
@@ -970,18 +970,18 @@ export default function MVP8Page() {
                       <div style={{ marginBottom: 20, fontSize: 18, color: T.textSecondary, lineHeight: 1.7 }}>
                         차량 브랜드를 먼저 선택하면 해당 브랜드의 EV 모델 목록이 나타나요.
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                         {BRANDS.map(brand => (
                           <div key={brand.id} onClick={() => handleBrandChange(brand.id)}
-                            style={{ cursor: 'pointer', border: `1px solid ${T.border}`, borderRadius: 12, padding: '22px 10px', textAlign: 'center', userSelect: 'none' }}>
-                            <div style={{ width: 64, height: 64, borderRadius: '50%', background: T.surfaceSecondary, color: T.textSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: brand.logoText.length > 3 ? 14 : 20, fontWeight: 600, margin: '0 auto 12px' }}>{brand.logoText}</div>
-                            <div style={{ fontSize: 17, color: T.textSecondary }}>{brand.name}</div>
+                            style={{ cursor: 'pointer', border: `1px solid ${T.border}`, borderRadius: 10, padding: '15px 7px', textAlign: 'center', userSelect: 'none' }}>
+                            <div style={{ width: 46, height: 46, borderRadius: '50%', background: T.surfaceSecondary, color: T.textSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: brand.logoText.length > 3 ? 10 : 15, fontWeight: 600, margin: '0 auto 8px' }}>{brand.logoText}</div>
+                            <div style={{ fontSize: 12, color: T.textSecondary }}>{brand.name}</div>
                           </div>
                         ))}
                       </div>
-                      <div style={{ marginTop: 22, padding: '22px 28px', background: `${T.accent}0b`, border: `1px solid ${T.accent}35`, borderRadius: 14 }}>
-                        <div style={{ fontSize: 19, fontWeight: 700, color: T.accent, marginBottom: 10 }}>찾는 차량이 없나요?</div>
-                        <p style={{ margin: 0, fontSize: 17, color: T.textSecondary, lineHeight: 1.8 }}>
+                      <div style={{ marginTop: 15, padding: '14px 18px', background: `${T.accent}0b`, border: `1px solid ${T.accent}35`, borderRadius: 11 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: T.accent, marginBottom: 7 }}>찾는 차량이 없나요?</div>
+                        <p style={{ margin: 0, fontSize: 12, color: T.textSecondary, lineHeight: 1.75 }}>
                           브랜드 목록에 없는 차량은 위에서 <strong style={{ color: T.text }}>직접 입력</strong>을 선택해 차량 이름, 배터리 용량, 전비를 직접 입력할 수 있어요. 테슬라 세미, 맞춤 차량 등 다양한 EV를 직접 등록해 계산할 수 있어요.
                         </p>
                       </div>
@@ -993,9 +993,9 @@ export default function MVP8Page() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         {[{ field: 'name', label: '차량명', type: 'text', placeholder: '예) 테슬라 세미' }, { field: 'batteryCapacityKwh', label: '배터리 (kWh)', type: 'number', placeholder: '예) 100' }, { field: 'maxRangeKm', label: '최대 항속 (km)', type: 'number', placeholder: '예) 300' }, { field: 'efficiencyKmPerKwh', label: '전비 (km/kWh)', type: 'number', placeholder: '자동 계산' }].map(({ field, label, type, placeholder }) => (
-                          <label key={field} style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase' }}>
+                          <label key={field} style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 10, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase' }}>
                             {label}
-                            <input type={type} placeholder={placeholder} value={custom[field]} onChange={e => setCustom(p => ({ ...p, [field]: e.target.value }))} style={{ padding: '14px 16px', border: `1px solid ${T.border}`, borderRadius: 9, fontSize: 17, background: T.surfaceSecondary, color: T.text, fontFamily: FONT, textTransform: 'none' }} />
+                            <input type={type} placeholder={placeholder} value={custom[field]} onChange={e => setCustom(p => ({ ...p, [field]: e.target.value }))} style={{ padding: '10px 12px', border: `1px solid ${T.border}`, borderRadius: 6, fontSize: 12, background: T.surfaceSecondary, color: T.text, fontFamily: FONT, textTransform: 'none' }} />
                           </label>
                         ))}
                         {custom.batteryCapacityKwh && custom.maxRangeKm && !custom.efficiencyKmPerKwh && (
@@ -1018,33 +1018,33 @@ export default function MVP8Page() {
                         <button onClick={() => handleBrandChange('')} style={{ fontSize: 16, padding: '10px 18px', borderRadius: 8, border: `1px solid ${T.border}`, background: 'transparent', color: T.textSecondary, cursor: 'pointer', fontFamily: FONT }}>← 다시 선택</button>
                         <span style={{ fontSize: 16, color: T.textSecondary, alignSelf: 'center' }}>{BRANDS.find(b => b.id === selectedBrand)?.name}</span>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10 }}>
                         {filteredVehicles.map(v => (
                           <div key={v.id} onClick={() => setSelectedId(v.id)}
-                            style={{ cursor: 'pointer', border: `1px solid ${selectedId === v.id ? T.accent : T.border}`, background: selectedId === v.id ? `${T.accent}10` : T.surfaceSecondary, borderRadius: 12, overflow: 'hidden', userSelect: 'none' }}>
-                            <div style={{ height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.bg, padding: '14px 16px', overflow: 'hidden' }}>
-                              <VehicleImage src={v.image} alt={v.name} T={T} maxWidth={220} maxHeight={140} />
+                            style={{ cursor: 'pointer', border: `1px solid ${selectedId === v.id ? T.accent : T.border}`, background: selectedId === v.id ? `${T.accent}10` : T.surfaceSecondary, borderRadius: 10, overflow: 'hidden', userSelect: 'none' }}>
+                            <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.bg, padding: '10px 12px', overflow: 'hidden' }}>
+                              <VehicleImage src={v.image} alt={v.name} T={T} maxWidth={160} maxHeight={100} />
                             </div>
-                            <div style={{ padding: '14px 16px' }}>
-                              <div style={{ fontSize: 18, fontWeight: 600, color: selectedId === v.id ? T.accent : T.text, marginBottom: 7 }}>{v.name}</div>
-                              <div style={{ fontSize: 15, color: T.textSecondary }}>{v.batteryCapacityKwh} kWh · {v.efficiencyKmPerKwh?.toFixed(1)} km/kWh</div>
+                            <div style={{ padding: '10px 12px' }}>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: selectedId === v.id ? T.accent : T.text, marginBottom: 5 }}>{v.name}</div>
+                              <div style={{ fontSize: 11, color: T.textSecondary }}>{v.batteryCapacityKwh} kWh · {v.efficiencyKmPerKwh?.toFixed(1)} km/kWh</div>
                             </div>
                           </div>
                         ))}
                       </div>
                       {vehicle && (
-                        <div style={{ marginTop: 20, padding: '18px 22px', background: `${T.accent}10`, border: `1px solid ${T.accent}40`, borderRadius: 13, display: 'flex', alignItems: 'center', gap: 20 }}>
-                          <div style={{ width: 120, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: T.bg, borderRadius: 10 }}>
-                            <VehicleImage src={vehicle.image} alt={vehicle.fullName} T={T} maxWidth={112} maxHeight={74} />
+                        <div style={{ marginTop: 14, padding: '12px 16px', background: `${T.accent}10`, border: `1px solid ${T.accent}40`, borderRadius: 11, display: 'flex', alignItems: 'center', gap: 14 }}>
+                          <div style={{ width: 90, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: T.bg, borderRadius: 8 }}>
+                            <VehicleImage src={vehicle.image} alt={vehicle.fullName} T={T} maxWidth={82} maxHeight={54} />
                           </div>
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 15, fontWeight: 600, color: T.accent, marginBottom: 5 }}>✓ 선택됨</div>
-                            <div style={{ fontSize: 22, fontWeight: 700, color: T.text, marginBottom: 6 }}>{vehicle.fullName}</div>
-                            <div style={{ fontSize: 17, color: T.textSecondary }}>{vehicle.batteryCapacityKwh} kWh · {vehicle.efficiencyKmPerKwh?.toFixed(1)} km/kWh · 최대 {vehicle.maxRangeKm} km</div>
+                            <div style={{ fontSize: 11, fontWeight: 600, color: T.accent, marginBottom: 3 }}>✓ 선택됨</div>
+                            <div style={{ fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 4 }}>{vehicle.fullName}</div>
+                            <div style={{ fontSize: 12, color: T.textSecondary }}>{vehicle.batteryCapacityKwh} kWh · {vehicle.efficiencyKmPerKwh?.toFixed(1)} km/kWh · 최대 {vehicle.maxRangeKm} km</div>
                           </div>
                         </div>
                       )}
-                      <div style={{ marginTop: 18, fontSize: 17, color: T.textSecondary, lineHeight: 1.7 }}>
+                      <div style={{ marginTop: 13, fontSize: 12, color: T.textSecondary, lineHeight: 1.7 }}>
                         선택한 차량의 배터리 용량과 전비를 기준으로 주행 가능 거리를 계산해요.
                       </div>
                     </>
@@ -1056,9 +1056,9 @@ export default function MVP8Page() {
               {step === 2 && (
                 <>
                   <SetupCard title="현재 배터리 (SOC)" T={T} done={true}>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 4, marginBottom: 16 }}>
-                      <span style={{ fontSize: 96, fontWeight: 400, lineHeight: 1, letterSpacing: '-0.04em', color: soc >= 30 ? T.success : T.danger }}>{soc}</span>
-                      <span style={{ fontSize: 34, color: T.textSecondary, marginBottom: 12 }}>%</span>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 4, marginBottom: 11 }}>
+                      <span style={{ fontSize: 64, fontWeight: 400, lineHeight: 1, letterSpacing: '-0.04em', color: soc >= 30 ? T.success : T.danger }}>{soc}</span>
+                      <span style={{ fontSize: 23, color: T.textSecondary, marginBottom: 8 }}>%</span>
                     </div>
                     <BatteryBar percent={soc} T={T} />
                     <div style={{ marginTop: 18 }}>
@@ -1070,22 +1070,22 @@ export default function MVP8Page() {
                       </div>
                     </div>
                     {isVehicleReady && (
-                      <div style={{ marginTop: 18, padding: '16px 20px', background: T.surfaceSecondary, borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: 18, color: T.textSecondary }}>예상 주행 가능 거리</span>
-                        <span style={{ fontSize: 26, fontWeight: 700, color: soc >= 30 ? T.success : T.danger }}>{estimatedRangeKm} km</span>
+                      <div style={{ marginTop: 11, padding: '11px 14px', background: T.surfaceSecondary, borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 13, color: T.textSecondary }}>예상 주행 가능 거리</span>
+                        <span style={{ fontSize: 18, fontWeight: 700, color: soc >= 30 ? T.success : T.danger }}>{estimatedRangeKm} km</span>
                       </div>
                     )}
                   </SetupCard>
 
                   <SetupCard title="안전 하한 SOC" T={T} done={true}>
-                    <div style={{ fontSize: 18, color: T.textSecondary, marginBottom: 20, lineHeight: 1.75, padding: '16px 20px', background: `${T.accent}08`, borderRadius: 11, border: `1px solid ${T.accent}20` }}>
+                    <div style={{ fontSize: 13, color: T.textSecondary, marginBottom: 14, lineHeight: 1.7, padding: '11px 14px', background: `${T.accent}08`, borderRadius: 11, border: `1px solid ${T.accent}20` }}>
                       운행 중 배터리가 이 기준 아래로 내려가지 않도록 설정하는 안전 하한이에요. 이 기준을 위반할 구간이 예상되면 충전을 권장해요.
                       <span style={{ fontWeight: 700, color: T.accent, marginLeft: 8 }}>현재 설정: {userMinReserveSoc}%</span>
                     </div>
-                    <div style={{ display: 'flex', gap: 10 }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
                       {[5, 10, 15, 20, 25, 30].map(v => (
                         <button key={v} onClick={() => setUserMinReserveSoc(v)}
-                          style={{ flex: 1, padding: '18px 0', borderRadius: 11, border: `1px solid ${userMinReserveSoc === v ? T.accent : T.border}`, background: userMinReserveSoc === v ? `${T.accent}18` : T.surfaceSecondary, color: userMinReserveSoc === v ? T.accent : T.textSecondary, fontSize: 18, fontWeight: userMinReserveSoc === v ? 700 : 400, cursor: 'pointer', fontFamily: FONT }}>
+                          style={{ flex: 1, padding: '13px 0', borderRadius: 9, border: `1px solid ${userMinReserveSoc === v ? T.accent : T.border}`, background: userMinReserveSoc === v ? `${T.accent}18` : T.surfaceSecondary, color: userMinReserveSoc === v ? T.accent : T.textSecondary, fontSize: 13, fontWeight: userMinReserveSoc === v ? 700 : 400, cursor: 'pointer', fontFamily: FONT }}>
                           {v}%
                         </button>
                       ))}
@@ -1097,17 +1097,17 @@ export default function MVP8Page() {
               {/* ── STEP 3: Start point ───────────────────────────────────── */}
               {step === 3 && (
                 <SetupCard title="출발지" T={T} done={true}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', background: T.bg, border: `1px solid ${T.border}`, borderRadius: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 15px', background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10 }}>
                     <div>
-                      <div style={{ fontSize: 22, fontWeight: 600, color: T.text, marginBottom: 6 }}>{startPoint.name}</div>
-                      {startPoint.address && <div style={{ fontSize: 17, color: T.textSecondary, marginTop: 2 }}>{startPoint.address}</div>}
-                      <div style={{ fontSize: 14, color: T.textSecondary, marginTop: 4, opacity: 0.6 }}>{startPoint.lat.toFixed(4)}, {startPoint.lng.toFixed(4)}</div>
+                      <div style={{ fontSize: 16, fontWeight: 600, color: T.text, marginBottom: 4 }}>{startPoint.name}</div>
+                      {startPoint.address && <div style={{ fontSize: 12, color: T.textSecondary, marginTop: 2 }}>{startPoint.address}</div>}
+                      <div style={{ fontSize: 11, color: T.textSecondary, marginTop: 3, opacity: 0.6 }}>{startPoint.lat.toFixed(4)}, {startPoint.lng.toFixed(4)}</div>
                     </div>
-                    <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 20 }}>
-                      <button onClick={() => setShowStartModal(true)} style={{ padding: '14px 24px', border: `1px solid ${T.accent}50`, borderRadius: 9, background: `${T.accent}14`, color: T.accent, fontSize: 18, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>변경</button>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 14 }}>
+                      <button onClick={() => setShowStartModal(true)} style={{ padding: '10px 17px', border: `1px solid ${T.accent}50`, borderRadius: 8, background: `${T.accent}14`, color: T.accent, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>변경</button>
                     </div>
                   </div>
-                  <div style={{ marginTop: 18, fontSize: 17, color: T.textSecondary, lineHeight: 1.7 }}>
+                  <div style={{ marginTop: 13, fontSize: 12, color: T.textSecondary, lineHeight: 1.7 }}>
                     주소나 장소명을 입력하면 출발 좌표를 자동으로 찾아 실제 도로 경로 계산에 사용해요.
                   </div>
                 </SetupCard>
@@ -1124,26 +1124,26 @@ export default function MVP8Page() {
                   {deliveries.length === 0 ? (
                     <div style={{ padding: '32px 0', textAlign: 'center', fontSize: 18, color: T.textSecondary }}>배송지가 없어요. 아래 버튼으로 추가하세요.</div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 12 }}>
                       {deliveries.map((d, i) => (
-                        <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', background: T.bg, border: `1px solid ${T.border}`, borderRadius: 11 }}>
-                          <div style={{ width: 38, height: 38, borderRadius: '50%', background: T.accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 600, flexShrink: 0 }}>{i + 1}</div>
+                        <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 13px', background: T.bg, border: `1px solid ${T.border}`, borderRadius: 9 }}>
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: T.accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>{i + 1}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 18, fontWeight: 500, color: T.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.name}</div>
-                            {d.address && <div style={{ fontSize: 15, color: T.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 4 }}>{d.address}</div>}
+                            <div style={{ fontSize: 13, fontWeight: 500, color: T.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.name}</div>
+                            {d.address && <div style={{ fontSize: 11, color: T.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 3 }}>{d.address}</div>}
                           </div>
-                          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                            <button onClick={() => openEditDest(d)} style={{ padding: '10px 16px', border: `1px solid ${T.border}`, borderRadius: 8, background: 'transparent', color: T.textSecondary, fontSize: 16, cursor: 'pointer', fontFamily: FONT }}>편집</button>
-                            <button onClick={() => handleDestDelete(d.id)} style={{ padding: '10px 16px', border: `1px solid ${T.danger}50`, borderRadius: 8, background: 'transparent', color: T.danger, fontSize: 16, cursor: 'pointer', fontFamily: FONT }}>삭제</button>
+                          <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                            <button onClick={() => openEditDest(d)} style={{ padding: '7px 11px', border: `1px solid ${T.border}`, borderRadius: 6, background: 'transparent', color: T.textSecondary, fontSize: 11, cursor: 'pointer', fontFamily: FONT }}>편집</button>
+                            <button onClick={() => handleDestDelete(d.id)} style={{ padding: '7px 11px', border: `1px solid ${T.danger}50`, borderRadius: 6, background: 'transparent', color: T.danger, fontSize: 11, cursor: 'pointer', fontFamily: FONT }}>삭제</button>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
-                  <button onClick={openAddDest} style={{ width: '100%', padding: '20px 0', border: `1px dashed ${T.accent}60`, borderRadius: 11, background: `${T.accent}08`, color: T.accent, fontSize: 20, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>
+                  <button onClick={openAddDest} style={{ width: '100%', padding: '14px 0', border: `1px dashed ${T.accent}60`, borderRadius: 9, background: `${T.accent}08`, color: T.accent, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>
                     + 배송지 추가
                   </button>
-                  <div style={{ marginTop: 18, fontSize: 17, color: T.textSecondary, lineHeight: 1.7 }}>
+                  <div style={{ marginTop: 13, fontSize: 12, color: T.textSecondary, lineHeight: 1.7 }}>
                     배송지는 실제 도로 경로 계산과 배터리 소모 예측에 사용돼요. 최적 순서를 적용하면 이동 거리를 줄일 수 있어요.
                   </div>
                 </SetupCard>
@@ -1152,95 +1152,129 @@ export default function MVP8Page() {
               {/* ── STEP 5: Review & start ────────────────────────────────── */}
               {step === 5 && (
                 <>
-                  <div style={{ background: T.surface, border: `2px solid ${T.border}`, borderRadius: 20, overflow: 'hidden', marginBottom: 28 }}>
-                    <div style={{ padding: '28px 32px', borderBottom: `1px solid ${T.border}`, background: `${T.accent}07` }}>
-                      <div style={{ fontSize: 32, fontWeight: 700, color: T.text, letterSpacing: '-0.02em' }}>운행 계획 확인</div>
-                      <div style={{ fontSize: 22, color: T.textSecondary, marginTop: 8 }}>아래 내용을 확인하고 운전 화면을 시작하세요</div>
+                  <div style={{ background: T.surface, border: `2px solid ${T.border}`, borderRadius: 16, overflow: 'hidden', marginBottom: 18 }}>
+                    <div style={{ padding: '18px 22px', borderBottom: `1px solid ${T.border}`, background: `${T.accent}07` }}>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: '-0.02em' }}>운행 계획 확인</div>
+                      <div style={{ fontSize: 15, color: T.textSecondary, marginTop: 5 }}>아래 내용을 확인하고 운전 화면을 시작하세요</div>
                     </div>
 
                     {/* Vehicle */}
-                    <div style={{ padding: '24px 32px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', gap: 24 }}>
-                      <div style={{ width: 160, height: 108, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: T.bg, borderRadius: 14 }}>
-                        <VehicleImage src={vehicle?.image} alt={vehicle?.fullName ?? ''} T={T} maxWidth={148} maxHeight={96} />
+                    <div style={{ padding: '16px 22px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div style={{ width: 110, height: 74, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: T.bg, borderRadius: 10 }}>
+                        <VehicleImage src={vehicle?.image} alt={vehicle?.fullName ?? ''} T={T} maxWidth={102} maxHeight={68} />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 30, fontWeight: 700, color: T.text, marginBottom: 8 }}>{vehicle?.fullName ?? '—'}</div>
-                        <div style={{ fontSize: 22, color: T.textSecondary }}>{vehicle?.grade} · {vehicle?.batteryCapacityKwh} kWh · {vehicle?.efficiencyKmPerKwh?.toFixed(1)} km/kWh</div>
+                        <div style={{ fontSize: 21, fontWeight: 700, color: T.text, marginBottom: 5 }}>{vehicle?.fullName ?? '—'}</div>
+                        <div style={{ fontSize: 15, color: T.textSecondary }}>{vehicle?.grade} · {vehicle?.batteryCapacityKwh} kWh · {vehicle?.efficiencyKmPerKwh?.toFixed(1)} km/kWh</div>
                       </div>
-                      <button onClick={() => setStep(1)} style={{ marginLeft: 'auto', fontSize: 18, color: T.accent, background: 'transparent', border: `1px solid ${T.accent}40`, borderRadius: 10, cursor: 'pointer', padding: '12px 22px', fontFamily: FONT, flexShrink: 0 }}>변경</button>
+                      <button onClick={() => setStep(1)} style={{ marginLeft: 'auto', fontSize: 13, color: T.accent, background: 'transparent', border: `1px solid ${T.accent}40`, borderRadius: 8, cursor: 'pointer', padding: '8px 15px', fontFamily: FONT, flexShrink: 0 }}>변경</button>
                     </div>
 
                     {/* Battery */}
-                    <div style={{ padding: '24px 32px', borderBottom: `1px solid ${T.border}`, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
+                    <div style={{ padding: '16px 22px', borderBottom: `1px solid ${T.border}`, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 13 }}>
                       <div>
-                        <div style={{ fontSize: 18, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>현재 배터리</div>
-                        <div style={{ fontSize: 36, fontWeight: 700, color: soc >= 30 ? T.success : T.danger }}>{soc}%</div>
+                        <div style={{ fontSize: 12, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 7 }}>현재 배터리</div>
+                        <div style={{ fontSize: 24, fontWeight: 700, color: soc >= 30 ? T.success : T.danger }}>{soc}%</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: 18, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>예상 주행 거리</div>
-                        <div style={{ fontSize: 36, fontWeight: 700, color: T.text }}>{estimatedRangeKm} km</div>
+                        <div style={{ fontSize: 12, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 7 }}>예상 주행 거리</div>
+                        <div style={{ fontSize: 24, fontWeight: 700, color: T.text }}>{estimatedRangeKm} km</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: 18, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>안전 하한 SOC</div>
-                        <div style={{ fontSize: 36, fontWeight: 700, color: T.text }}>{userMinReserveSoc}%</div>
+                        <div style={{ fontSize: 12, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 7 }}>안전 하한 SOC</div>
+                        <div style={{ fontSize: 24, fontWeight: 700, color: T.text }}>{userMinReserveSoc}%</div>
                       </div>
                     </div>
 
                     {/* Start point */}
-                    <div style={{ padding: '24px 32px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ padding: '16px 22px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div>
-                        <div style={{ fontSize: 18, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>출발지</div>
-                        <div style={{ fontSize: 28, fontWeight: 600, color: T.text }}>{startPoint.name}</div>
-                        {startPoint.address && <div style={{ fontSize: 20, color: T.textSecondary, marginTop: 6 }}>{startPoint.address}</div>}
+                        <div style={{ fontSize: 12, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 7 }}>출발지</div>
+                        <div style={{ fontSize: 19, fontWeight: 600, color: T.text }}>{startPoint.name}</div>
+                        {startPoint.address && <div style={{ fontSize: 14, color: T.textSecondary, marginTop: 4 }}>{startPoint.address}</div>}
                       </div>
-                      <button onClick={() => setStep(3)} style={{ fontSize: 18, color: T.accent, background: 'transparent', border: `1px solid ${T.accent}40`, borderRadius: 10, cursor: 'pointer', padding: '12px 22px', fontFamily: FONT, flexShrink: 0 }}>변경</button>
+                      <button onClick={() => setStep(3)} style={{ fontSize: 13, color: T.accent, background: 'transparent', border: `1px solid ${T.accent}40`, borderRadius: 8, cursor: 'pointer', padding: '8px 15px', fontFamily: FONT, flexShrink: 0 }}>변경</button>
                     </div>
 
                     {/* Deliveries */}
-                    <div style={{ padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div>
-                        <div style={{ fontSize: 18, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>배송 경로</div>
-                        <div style={{ fontSize: 28, fontWeight: 600, color: T.text }}>{deliveries.length}개 배송지 · 예상 {totalRouteKm} km</div>
+                        <div style={{ fontSize: 12, color: T.textSecondary, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 7 }}>배송 경로</div>
+                        <div style={{ fontSize: 19, fontWeight: 600, color: T.text }}>{deliveries.length}개 배송지 · 예상 {totalRouteKm} km</div>
                         {isVehicleReady && (
-                          <div style={{ fontSize: 20, color: effectiveCanDeliver ? T.success : T.danger, marginTop: 6 }}>
+                          <div style={{ fontSize: 14, color: effectiveCanDeliver ? T.success : T.danger, marginTop: 4 }}>
                             {effectiveCanDeliver ? `여유 ${Math.max(0, surplusRangeKm).toFixed(1)} km` : '충전 경유 필요'}
                           </div>
                         )}
                       </div>
-                      <button onClick={() => setStep(4)} style={{ fontSize: 18, color: T.accent, background: 'transparent', border: `1px solid ${T.accent}40`, borderRadius: 10, cursor: 'pointer', padding: '12px 22px', fontFamily: FONT, flexShrink: 0 }}>편집</button>
+                      <button onClick={() => setStep(4)} style={{ fontSize: 13, color: T.accent, background: 'transparent', border: `1px solid ${T.accent}40`, borderRadius: 8, cursor: 'pointer', padding: '8px 15px', fontFamily: FONT, flexShrink: 0 }}>편집</button>
                     </div>
                   </div>
 
                   <button onClick={handleEnterCockpit} disabled={!isVehicleReady || deliveries.length === 0}
-                    style={{ width: '100%', padding: '32px 0', border: 'none', borderRadius: 18, background: isVehicleReady && deliveries.length > 0 ? T.accent : T.surfaceSecondary, color: isVehicleReady && deliveries.length > 0 ? '#fff' : T.textSecondary, fontSize: 32, fontWeight: 700, cursor: isVehicleReady && deliveries.length > 0 ? 'pointer' : 'not-allowed', fontFamily: FONT, letterSpacing: '-0.01em' }}>
+                    style={{ width: '100%', padding: '22px 0', border: 'none', borderRadius: 14, background: isVehicleReady && deliveries.length > 0 ? T.accent : T.surfaceSecondary, color: isVehicleReady && deliveries.length > 0 ? '#fff' : T.textSecondary, fontSize: 22, fontWeight: 700, cursor: isVehicleReady && deliveries.length > 0 ? 'pointer' : 'not-allowed', fontFamily: FONT, letterSpacing: '-0.01em' }}>
                     {isVehicleReady && deliveries.length > 0 ? '운전 화면 시작 →' : !isVehicleReady ? '차량을 선택하세요 (1단계)' : '배송지를 추가하세요 (4단계)'}
                   </button>
                 </>
               )}
 
-            </div>
-          </div>
 
-          {/* Navigation bar — 설정 단계용 (하단 바 대체) */}
-          <div style={{ flexShrink: 0, padding: '14px 24px', display: 'flex', alignItems: 'center', gap: 10, borderTop: `1px solid ${T.border}`, background: T.surface }}>
-            {step > 1 && (
-              <button onClick={() => setStep(s => s - 1)}
-                style={{ padding: '0 22px', border: `1px solid ${T.border}`, borderRadius: 8, background: 'transparent', color: T.text, fontSize: HMI.text.body, fontWeight: 500, cursor: 'pointer', fontFamily: FONT, minHeight: HMI.touch.normal }}>
-                ← 이전
-              </button>
-            )}
-            <div style={{ flex: 1 }} />
-            {step < 5 ? (
-              <button onClick={() => setStep(s => s + 1)} disabled={!stepCanProceed[step - 1]}
-                style={{ padding: '0 28px', border: 'none', borderRadius: 8, background: stepCanProceed[step - 1] ? T.accent : T.surfaceSecondary, color: stepCanProceed[step - 1] ? '#fff' : T.textSecondary, fontSize: HMI.text.bodyStrong, fontWeight: 600, cursor: stepCanProceed[step - 1] ? 'pointer' : 'not-allowed', fontFamily: FONT, minHeight: HMI.touch.normal }}>
-                다음 →
-              </button>
-            ) : (
-              <button onClick={handleEnterCockpit} disabled={!isVehicleReady || deliveries.length === 0}
-                style={{ padding: '0 28px', border: 'none', borderRadius: 8, background: isVehicleReady && deliveries.length > 0 ? T.accent : T.surfaceSecondary, color: isVehicleReady && deliveries.length > 0 ? '#fff' : T.textSecondary, fontSize: HMI.text.bodyStrong, fontWeight: 600, cursor: isVehicleReady && deliveries.length > 0 ? 'pointer' : 'not-allowed', fontFamily: FONT, minHeight: HMI.touch.normal }}>
-                {isVehicleReady && deliveries.length > 0 ? '운전 화면 시작 →' : !isVehicleReady ? '차량을 선택하세요' : '배송지를 추가하세요'}
-              </button>
-            )}
+              {/* ── Step navigation row — grouped with card content */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: 8,
+                paddingBottom: 48,
+                gap: 12,
+              }}>
+                {/* Previous */}
+                {step > 1 ? (
+                  <button
+                    onClick={() => setStep(s => s - 1)}
+                    style={{
+                      padding: '0 20px',
+                      border: `1.5px solid ${T.border}`,
+                      borderRadius: 8,
+                      background: 'transparent',
+                      color: T.text,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      fontFamily: FONT,
+                      minHeight: 40,
+                      letterSpacing: '-0.2px',
+                    }}
+                  >
+                    ← 이전
+                  </button>
+                ) : <div />}
+
+                {/* Next */}
+                {step < 5 && (
+                  <button
+                    onClick={() => setStep(s => s + 1)}
+                    disabled={!stepCanProceed[step - 1]}
+                    style={{
+                      padding: '0 26px',
+                      border: 'none',
+                      borderRadius: 8,
+                      background: stepCanProceed[step - 1] ? T.accent : T.surfaceSecondary,
+                      color: stepCanProceed[step - 1] ? '#fff' : T.textSecondary,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: stepCanProceed[step - 1] ? 'pointer' : 'not-allowed',
+                      fontFamily: FONT,
+                      minHeight: 40,
+                      letterSpacing: '-0.2px',
+                    }}
+                  >
+                    다음 →
+                  </button>
+                )}
+              </div>
+
+            </div>
           </div>
         </div>
       )}
@@ -1250,11 +1284,11 @@ export default function MVP8Page() {
         <div style={{ display: 'flex', height: zoneH, minHeight: 500, overflow: 'hidden' }}>
 
           {/* LEFT PANEL */}
-          <div style={{ width: showDetailsPanel ? '22%' : '28%', flexShrink: 0, borderRight: `1px solid ${T.border}`, overflowY: 'auto', background: T.surface, transition: 'width 0.2s', minHeight: 0 }}>
+          <div style={{ width: showDetailsPanel ? '25.5%' : '28%', flexShrink: 0, borderRight: `1px solid ${T.border}`, overflowY: 'auto', background: T.surface, transition: 'width 0.2s', minHeight: 0 }}>
 
             {/* Vehicle cluster */}
-            <div style={{ margin: '12px 12px 0', borderRadius: 10, background: T.bg, border: `1px solid ${T.border}`, overflow: 'hidden', flexShrink: 0 }}>
-              <div style={{ padding: '10px 14px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ margin: '8px 8px 0', borderRadius: 8, background: T.bg, border: `1px solid ${T.border}`, overflow: 'hidden', flexShrink: 0 }}>
+              <div style={{ padding: '7px 10px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                   <div style={{ fontSize: HMI.text.title, fontWeight: 600, color: T.text, lineHeight: 1.2 }}>{vehicle?.fullName}</div>
                   <div style={{ fontSize: HMI.text.caption, color: T.textSecondary, marginTop: 2 }}>{vehicle?.grade}</div>
@@ -1266,7 +1300,7 @@ export default function MVP8Page() {
                 )}
               </div>
 
-              <div style={{ padding: '12px 14px 0' }}>
+              <div style={{ padding: '8px 10px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1, textAlign: 'center' }}>
                     <div style={{ fontSize: HMI.text.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 4 }}>배터리</div>
@@ -1286,8 +1320,8 @@ export default function MVP8Page() {
                 </div>
               </div>
 
-              <div style={{ padding: '8px 14px 6px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100, overflow: 'hidden' }}>
-                <VehicleImage src={vehicle?.image} alt={vehicle?.fullName ?? ''} T={T} maxWidth={190} maxHeight={90} />
+              <div style={{ padding: '5px 10px 4px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 70, overflow: 'hidden' }}>
+                <VehicleImage src={vehicle?.image} alt={vehicle?.fullName ?? ''} T={T} maxWidth={140} maxHeight={66} />
               </div>
               <div style={{ padding: '2px 14px 8px' }}>
                 <BatteryBar percent={soc} T={T} />
@@ -1654,21 +1688,17 @@ export default function MVP8Page() {
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
             {deliveryRouteStatus === 'loading' && (
               <div style={{
-                position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)', zIndex: 10,
-                width: 'min(clamp(360px, 52vw, 640px), calc(100% - 48px))',
-                padding: '28px 36px',
-                background: themeName === 'dark' ? 'rgba(10,11,13,0.93)' : 'rgba(255,255,255,0.97)',
-                border: `1px solid ${T.border}`, borderRadius: 18,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)', fontFamily: FONT,
+                position: 'absolute', top: 10, left: 12, right: 12, zIndex: 10,
+                padding: '8px 14px',
+                background: themeName === 'dark' ? 'rgba(16,18,22,0.92)' : 'rgba(248,250,252,0.97)',
+                border: `1px solid ${T.accent}45`,
+                borderRadius: 10, backdropFilter: 'blur(8px)',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.14)',
+                display: 'flex', alignItems: 'center', gap: 10, fontFamily: FONT,
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                  <span style={{ width: 14, height: 14, borderRadius: '50%', background: T.accent, flexShrink: 0 }} />
-                  <span style={{ fontSize: 'clamp(22px, 2.6vh, 30px)', fontWeight: 700, color: T.text }}>실제 도로 경로를 계산하고 있어요</span>
-                </div>
-                <div style={{ fontSize: 'clamp(15px, 1.7vh, 18px)', color: T.textSecondary, lineHeight: 1.8 }}>
-                  충전소 정보를 함께 불러오는 중이에요<br/>
-                  <span style={{ fontSize: 'clamp(13px, 1.4vh, 16px)', opacity: 0.75 }}>처음 접속한 경우 30~60초 정도 걸릴 수 있어요</span>
-                </div>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: T.accent, flexShrink: 0 }} />
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>실제 도로 경로를 불러오는 중입니다.</span>
+                <span style={{ fontSize: 12, color: T.textSecondary }}>잠시만 기다려 주세요.</span>
               </div>
             )}
             {deliveryRouteStatus === 'error' && (
@@ -1705,6 +1735,7 @@ export default function MVP8Page() {
             </div>
           </div>
           {showDetailsPanel && (
+            <div style={{ width: '25.5%', flexShrink: 0, height: '100%' }}>
             <EVIntelligencePanel
               open={true}
               onClose={() => setShowDetailsPanel(false)}
@@ -1738,6 +1769,7 @@ export default function MVP8Page() {
               T={T}
               themeName={themeName}
             />
+            </div>
           )}
         </div>
       )}
@@ -1749,26 +1781,26 @@ export default function MVP8Page() {
             <div style={{ fontSize: HMI.text.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>총 경로</div>
             <div style={{ fontSize: HMI.text.title, fontWeight: 600, color: T.text }}>{effectiveRouteKm} km</div>
           </div>
-          <div style={{ width: 1, height: 36, background: T.border, margin: '0 12px' }} />
+          <div style={{ width: 1, height: 26, background: T.border, margin: '0 10px' }} />
           <div style={{ padding: '0 8px' }}>
             <div style={{ fontSize: HMI.text.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>배송지</div>
             <div style={{ fontSize: HMI.text.title, fontWeight: 600, color: T.text }}>{deliveries.length}개</div>
           </div>
-          <div style={{ width: 1, height: 36, background: T.border, margin: '0 12px' }} />
+          <div style={{ width: 1, height: 26, background: T.border, margin: '0 10px' }} />
           <div style={{ padding: '0 8px' }}>
             <div style={{ fontSize: HMI.text.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>주행 가능</div>
             <div style={{ fontSize: HMI.text.title, fontWeight: 600, color: T.text }}>{estimatedRangeKm} km</div>
           </div>
           {intlHealthScore != null && (
             <>
-              <div style={{ width: 1, height: 36, background: T.border, margin: '0 12px' }} />
+              <div style={{ width: 1, height: 26, background: T.border, margin: '0 10px' }} />
               <div style={{ padding: '0 8px' }}>
                 <div style={{ fontSize: HMI.text.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>운행 안정도</div>
                 <div style={{ fontSize: HMI.text.title, fontWeight: 600, color: intlHealthScore >= 85 ? T.success : intlHealthScore >= 70 ? T.accent : intlHealthScore >= 50 ? T.warning : T.danger }}>{intlHealthScore}</div>
               </div>
             </>
           )}
-          <div style={{ width: 1, height: 36, background: T.border, margin: '0 14px' }} />
+          <div style={{ width: 1, height: 26, background: T.border, margin: '0 10px' }} />
           {statusCfg && (
             <div style={{ padding: '7px 16px', borderRadius: 20, background: `${statusCfg.color}18`, border: `1px solid ${statusCfg.color}50`, fontSize: HMI.text.body, fontWeight: 600, color: statusCfg.color }}>
               {statusCfg.label}
@@ -1790,61 +1822,61 @@ export default function MVP8Page() {
             position: 'fixed', inset: 0, zIndex: 300,
             background: 'rgba(0,0,0,0.82)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 24px',
+            padding: '0 20px',
           }}
         >
           <div style={{
-            width: '100%', maxWidth: 'min(960px, calc(100vw - 40px))',
+            width: '100%', maxWidth: 'min(520px, calc(100vw - 40px))',
             background: T.surface,
-            borderRadius: 24,
+            borderRadius: 16,
             border: `1px solid ${T.border}`,
             overflow: 'hidden',
-            boxShadow: '0 40px 80px rgba(0,0,0,0.55)',
+            boxShadow: '0 20px 48px rgba(0,0,0,0.45)',
           }}>
             {/* Header */}
             <div style={{
-              padding: '40px 56px 32px',
+              padding: '20px 28px 16px',
               borderBottom: `1px solid ${T.border}`,
-              display: 'flex', alignItems: 'center', gap: 24,
+              display: 'flex', alignItems: 'center', gap: 14,
             }}>
               <div style={{
-                width: 88, height: 88, borderRadius: '50%', flexShrink: 0,
+                width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
                 background: `${T.accent}18`, border: `2px solid ${T.accent}40`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 42,
+                fontSize: 22,
               }}>⚡</div>
               <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>처음 오셨나요?</div>
-                <div style={{ fontSize: 44, fontWeight: 700, color: T.text, letterSpacing: '-0.02em', lineHeight: 1.15 }}>처음 이용 안내</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>처음 오셨나요?</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: '-0.02em', lineHeight: 1.15 }}>처음 이용 안내</div>
               </div>
             </div>
 
             {/* Body */}
-            <div style={{ padding: '38px 56px 20px', display: 'flex', flexDirection: 'column', gap: 32 }}>
+            <div style={{ padding: '18px 28px 12px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
               {/* 서비스 목적 */}
               <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>서비스 목적</div>
-                <p style={{ margin: 0, fontSize: 22, color: T.text, lineHeight: 1.85 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 7 }}>서비스 목적</div>
+                <p style={{ margin: 0, fontSize: 13, color: T.text, lineHeight: 1.7 }}>
                   이 서비스는 전기 배송차량의 배송 경로와 배터리 상태를 함께 분석해 충전이 필요한 시점과 추천 충전소를 알려주는 서비스예요.
                 </p>
               </div>
 
               {/* 사용 방법 */}
               <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>사용 방법</div>
-                <p style={{ margin: 0, fontSize: 22, color: T.text, lineHeight: 1.85 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 7 }}>사용 방법</div>
+                <p style={{ margin: 0, fontSize: 13, color: T.text, lineHeight: 1.7 }}>
                   차량 종류와 현재 SOC를 입력하고, 출발지와 배송지를 설정하면 실제 도로 경로를 기준으로 배송 가능 여부를 계산해요. 배터리가 부족하거나 안전 하한 SOC보다 낮아질 가능성이 있으면, 경로 중 언제 충전해야 하는지와 어떤 충전소를 검토하면 좋은지 함께 보여줘요.
                 </p>
               </div>
 
               {/* 로딩 안내 */}
               <div style={{
-                padding: '28px 34px', borderRadius: 16,
+                padding: '12px 16px', borderRadius: 10,
                 background: `${T.warning}10`, border: `1px solid ${T.warning}30`,
               }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: T.warning, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>로딩 안내</div>
-                <p style={{ margin: 0, fontSize: 22, color: T.text, lineHeight: 1.85 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.warning, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 7 }}>로딩 안내</div>
+                <p style={{ margin: 0, fontSize: 13, color: T.text, lineHeight: 1.7 }}>
                   실제 도로 경로와 충전소 정보는 외부 API를 불러와 계산해요. 차량과 배송지를 설정한 뒤 지도 화면으로 넘어갈 때 경로 계산이나 충전소 정보 로딩이 약 30~60초 걸릴 수 있어요. 잠시 기다리거나 새로고침하면 다시 이용할 수 있어요.
                 </p>
               </div>
@@ -1852,14 +1884,14 @@ export default function MVP8Page() {
             </div>
 
             {/* Footer */}
-            <div style={{ padding: '32px 56px 48px' }}>
+            <div style={{ padding: '12px 28px 20px' }}>
               <button
                 onClick={handleGuideClose}
                 style={{
-                  width: '100%', padding: '26px 0',
-                  border: 'none', borderRadius: 16,
+                  width: '100%', padding: '13px 0',
+                  border: 'none', borderRadius: 10,
                   background: T.accent, color: '#fff',
-                  fontSize: 23, fontWeight: 700, cursor: 'pointer',
+                  fontSize: 15, fontWeight: 700, cursor: 'pointer',
                   fontFamily: FONT, letterSpacing: '-0.01em',
                 }}
               >
@@ -1951,31 +1983,31 @@ function StepperBar({ step, T }) {
     const isDone = num < step
     if (i > 0) {
       items.push(
-        <div key={`l${i}`} style={{ flex: 1, height: 4, background: isDone ? T.accent : T.border, maxWidth: 100, minWidth: 24 }} />
+        <div key={`l${i}`} style={{ flex: 1, height: 3, background: isDone ? T.accent : T.border, maxWidth: 70, minWidth: 16 }} />
       )
     }
     items.push(
-      <div key={num} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      <div key={num} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
         <div style={{
-          width: 68, height: 68, borderRadius: '50%',
+          width: 48, height: 48, borderRadius: '50%',
           background: isDone ? T.success : isCurrent ? T.accent : T.surfaceSecondary,
           color: isDone || isCurrent ? '#fff' : T.textSecondary,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 26, fontWeight: 700, flexShrink: 0,
+          fontSize: 18, fontWeight: 700, flexShrink: 0,
           border: `2px solid ${isDone ? T.success : isCurrent ? T.accent : T.border}`,
-          boxShadow: isCurrent ? `0 0 0 7px ${T.accent}22` : 'none',
+          boxShadow: isCurrent ? `0 0 0 5px ${T.accent}22` : 'none',
           transition: 'box-shadow 0.2s, background 0.2s',
         }}>
           {isDone ? '✓' : num}
         </div>
-        <span style={{ fontSize: 17, color: isCurrent ? T.accent : isDone ? T.success : T.textSecondary, fontWeight: isCurrent ? 700 : 500, whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 12, color: isCurrent ? T.accent : isDone ? T.success : T.textSecondary, fontWeight: isCurrent ? 700 : 500, whiteSpace: 'nowrap' }}>
           {label}
         </span>
       </div>
     )
   })
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '28px 60px', background: T.surface, borderBottom: `1px solid ${T.border}`, flexShrink: 0, gap: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '18px 40px', background: T.surface, borderBottom: `1px solid ${T.border}`, flexShrink: 0, gap: 0 }}>
       {items}
     </div>
   )

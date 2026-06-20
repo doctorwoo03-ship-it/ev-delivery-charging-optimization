@@ -21,15 +21,23 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
   }
   const cfg = cfgMap[state] ?? { color: T.warning, icon: '!', title: '상태 확인 필요' }
 
-  const fs = hmi?.text ?? {
-    caption:    '13px',
-    body:       '15px',
-    bodyStrong: '17px',
-    title:      '19px',
+  const fs = {
+    caption:    'clamp(10px, 1.1vh, 12px)',
+    body:       'clamp(12px, 1.35vh, 14px)',
+    bodyStrong: 'clamp(13px, 1.5vh, 16px)',
+    title:      'clamp(14px, 1.65vh, 18px)',
   }
-  const touchNormal = hmi?.touch?.normal ?? 48
+  const touchNormal = 36
 
   const isMidRouteCharge = state === 'chargeNeeded' && data?.insertionType && data.insertionType !== 'before-departure'
+
+  const statusTitle = state === 'chargeNeeded' && data?.insertionLabel
+    ? data.insertionLabel
+    : (state === 'review-candidate' && data?.hasNearbyReachableCharger)
+      ? '출발 전 충전 필요'
+      : (state === 'review-candidate' && data?.recommendationSource === 'mid-route')
+        ? '경로 중 충전 검토 필요'
+        : cfg.title
 
   return (
     <div style={{
@@ -39,41 +47,38 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
       transform: 'translateX(-50%)',
       zIndex: 10,
       width: isMidRouteCharge
-        ? 'min(clamp(780px, 68vw, 1080px), calc(100% - 32px))'
-        : 'min(clamp(660px, 56vw, 920px), calc(100% - 32px))',
+        ? 'min(clamp(620px, 52vw, 880px), calc(100% - 32px))'
+        : 'min(clamp(520px, 44vw, 760px), calc(100% - 32px))',
       background: bgColor,
-      borderRadius: 12,
-      border: `1px solid ${cfg.color}45`,
-      backdropFilter: 'blur(8px)',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.22)',
+      borderRadius: 13,
+      border: `1.5px solid ${cfg.color}50`,
+      backdropFilter: 'blur(10px)',
+      boxShadow: `0 4px 20px rgba(0,0,0,0.22), 0 1px 6px ${cfg.color}18`,
       fontFamily: FONT,
     }}>
-      {/* Status strip */}
+      {/* Status headline strip */}
       <div style={{
-        padding: '8px 16px',
+        padding: '10px 16px',
         background: `${cfg.color}18`,
-        borderBottom: `1px solid ${cfg.color}28`,
+        borderBottom: `1px solid ${cfg.color}30`,
         display: 'flex', alignItems: 'center', gap: 8,
-        borderRadius: '12px 12px 0 0',
+        borderRadius: '11px 11px 0 0',
       }}>
-        <span style={{ fontSize: fs.bodyStrong, fontWeight: 600, color: cfg.color, whiteSpace: 'nowrap' }}>
-          {cfg.icon}{' '}
-          {state === 'chargeNeeded' && data?.insertionLabel
-            ? data.insertionLabel
-            : (state === 'review-candidate' && data?.hasNearbyReachableCharger)
-              ? '출발 전 충전 필요'
-              : (state === 'review-candidate' && data?.recommendationSource === 'mid-route')
-                ? '경로 중 충전 검토 필요'
-                : cfg.title}
+        <span style={{
+          fontSize: 18, lineHeight: 1, flexShrink: 0,
+          filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.15))',
+        }}>{cfg.icon}</span>
+        <span style={{ fontSize: fs.title, fontWeight: 700, color: cfg.color, letterSpacing: '-0.2px', lineHeight: 1.1 }}>
+          {statusTitle}
         </span>
       </div>
 
       {/* Body */}
-      <div style={{ padding: '14px 20px 16px' }}>
+      <div style={{ padding: '12px 16px 12px' }}>
         {state === 'canDeliver' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Next action */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 다음 배송지
               </div>
@@ -87,7 +92,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               )}
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Delivery summary */}
             <div style={{ flex: 1 }}>
@@ -117,7 +122,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'lowMargin' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Next action */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 다음 배송지
               </div>
@@ -131,7 +136,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               )}
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Battery status: low margin */}
             <div style={{ flex: 1 }}>
@@ -156,7 +161,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'reserveWarning' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Next action */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 다음 배송지
               </div>
@@ -170,7 +175,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               )}
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Reserve warning: SOC gap */}
             <div style={{ flex: 1, paddingRight: data.recommendedCharger ? 20 : 0 }}>
@@ -193,8 +198,8 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
             {/* Optional charger */}
             {data.recommendedCharger && (
               <>
-                <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
-                <div style={{ flex: '0 0 auto', minWidth: 140 }}>
+                <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
+                <div style={{ flex: '0 0 auto', minWidth: 100 }}>
                   <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                     권장 충전소
                   </div>
@@ -218,7 +223,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'predeparture-charge' && (
           <div style={{ display: 'flex', gap: 0, flexWrap: 'wrap' }}>
             {/* Block 1: Current SOC vs threshold */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 배터리 현황
               </div>
@@ -235,7 +240,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               )}
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 2: Action required */}
             <div style={{ flex: 1, paddingRight: data.recommendedCharger ? 20 : 0 }}>
@@ -253,8 +258,8 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
             {/* Block 3: Recommended charger if available */}
             {data.recommendedCharger && (
               <>
-                <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
-                <div style={{ flex: '0 0 auto', minWidth: 140 }}>
+                <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
+                <div style={{ flex: '0 0 auto', minWidth: 100 }}>
                   <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                     권장 충전소
                   </div>
@@ -285,7 +290,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'chargeNeeded' && (
           <div style={{ display: 'flex', gap: 0, flexWrap: 'wrap' }}>
             {/* Block 1: Charger stop */}
-            <div style={{ flex: '0 0 auto', minWidth: 180, paddingRight: 20 }}>
+            <div style={{ flex: '0 0 auto', minWidth: 120, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 경유 충전소
               </div>
@@ -318,11 +323,11 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 2: Charging plan */}
             {data.chargePlan && (
-              <div style={{ flex: 1, paddingRight: 20 }}>
+              <div style={{ flex: 1, paddingRight: 14 }}>
                 <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                   충전 계획
                 </div>
@@ -346,12 +351,12 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
             )}
 
             {data.chargePlan && (
-              <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+              <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
             )}
 
             {/* Block 3: Delivery feasibility */}
             {data.chargePlan && (
-              <div style={{ flex: '0 0 auto', minWidth: 150 }}>
+              <div style={{ flex: '0 0 auto', minWidth: 110 }}>
                 <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                   충전 후 배송
                 </div>
@@ -384,7 +389,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'unreachable' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Block 1: Problem */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 충전소까지 거리
               </div>
@@ -396,10 +401,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 2: Shortage */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 부족 거리
               </div>
@@ -413,7 +418,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 3: Next action */}
             <div style={{ flex: '0 0 auto' }}>
@@ -442,7 +447,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'critical' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Block 1: Checking status — temporary state, not a confirmed error */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                 <svg width={12} height={12} viewBox="0 0 12 12" style={{ flexShrink: 0 }}>
                   <circle cx={6} cy={6} r={4.5} fill="none" stroke={`${T.warning}40`} strokeWidth={2} />
@@ -460,10 +465,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 2: Battery status */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 배터리 상태
               </div>
@@ -475,7 +480,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 3: Next action */}
             <div style={{ flex: '0 0 auto' }}>
@@ -504,7 +509,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'api-error' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Block 1: Driver action */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 조치 필요
               </div>
@@ -516,10 +521,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 2: Battery status */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 배터리 상태
               </div>
@@ -531,10 +536,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 3: Guidance */}
-            <div style={{ flex: '0 0 auto', minWidth: 130 }}>
+            <div style={{ flex: '0 0 auto', minWidth: 95 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 안내
               </div>
@@ -548,7 +553,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'api-empty' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Block 1: Situation */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 현재 상황
               </div>
@@ -560,10 +565,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 2: Battery status */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 배터리 상태
               </div>
@@ -575,10 +580,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 3: Guidance */}
-            <div style={{ flex: '0 0 auto', minWidth: 130 }}>
+            <div style={{ flex: '0 0 auto', minWidth: 95 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 안내
               </div>
@@ -592,7 +597,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'no-local-data' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Block 1: Situation */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 현재 상황
               </div>
@@ -604,10 +609,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 2: Battery status */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 배터리 상태
               </div>
@@ -619,10 +624,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 3: Guidance */}
-            <div style={{ flex: '0 0 auto', minWidth: 130 }}>
+            <div style={{ flex: '0 0 auto', minWidth: 95 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 안내
               </div>
@@ -636,7 +641,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
         {state === 'no-suitable-charger' && (
           <div style={{ display: 'flex', gap: 0 }}>
             {/* Block 1: Situation */}
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div style={{ flex: 1, paddingRight: 14 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 현재 상황
               </div>
@@ -648,11 +653,11 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             </div>
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 2: Nearest rejected candidate (if any) */}
             {data?.nearestRejectedDepartureCharger ? (
-              <div style={{ flex: 1, paddingRight: 20 }}>
+              <div style={{ flex: 1, paddingRight: 14 }}>
                 <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                   가장 가까운 후보
                 </div>
@@ -667,7 +672,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
                 </div>
               </div>
             ) : (
-              <div style={{ flex: 1, paddingRight: 20 }}>
+              <div style={{ flex: 1, paddingRight: 14 }}>
                 <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                   검토 결과
                 </div>
@@ -685,10 +690,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
               </div>
             )}
 
-            <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+            <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
             {/* Block 3: Guidance */}
-            <div style={{ flex: '0 0 auto', minWidth: 130 }}>
+            <div style={{ flex: '0 0 auto', minWidth: 95 }}>
               <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 안내
               </div>
@@ -716,7 +721,7 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
             <div>
               <div style={{ display: 'flex', gap: 0 }}>
                 {/* Column 1: Current situation */}
-                <div style={{ flex: 1, paddingRight: 20 }}>
+                <div style={{ flex: 1, paddingRight: 14 }}>
                   <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                     현재 상황
                   </div>
@@ -725,10 +730,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
                   </div>
                 </div>
 
-                <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+                <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
                 {/* Column 2: Charging timing — primary emphasis */}
-                <div style={{ flex: 1, paddingRight: 20 }}>
+                <div style={{ flex: 1, paddingRight: 14 }}>
                   <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                     충전 시점
                   </div>
@@ -737,10 +742,10 @@ function RouteActionOverlay({ state, data, onOpenSocModal, T, themeName, hmi }) 
                   </div>
                 </div>
 
-                <div style={{ width: 1, background: `${T.border}60`, alignSelf: 'stretch', marginRight: 20 }} />
+                <div style={{ width: 1, background: `${T.border}70`, alignSelf: 'stretch', marginRight: 16 }} />
 
                 {/* Column 3: Candidate charger */}
-                <div style={{ flex: '0 0 auto', minWidth: 130 }}>
+                <div style={{ flex: '0 0 auto', minWidth: 95 }}>
                   <div style={{ fontSize: fs.caption, fontWeight: 500, color: T.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                     후보 충전소
                   </div>
