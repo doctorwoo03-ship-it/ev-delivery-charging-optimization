@@ -273,6 +273,8 @@ function MapPanel({ T, themeName, deliveries, chargers, recommendedChargerId, ch
   const startPointOverlayRef = useRef(null)
   const ignoreNextMapClickRef = useRef(false)
   const routeSeqRef = useRef(0)
+  const themeNameRef = useRef(themeName)
+  useEffect(() => { themeNameRef.current = themeName }, [themeName])
 
   // Map initialization
   useEffect(() => {
@@ -335,14 +337,18 @@ function MapPanel({ T, themeName, deliveries, chargers, recommendedChargerId, ch
     depotEl.addEventListener('click', () => {
       ignoreNextMapClickRef.current = true
       setSelectedCharger(null)
-      iw.setContent(`<div style="padding:8px;font-size:13px;">${sp.name}</div>`)
+      const dark = themeNameRef.current === 'dark'
+      const iwBg = dark ? 'rgba(15,23,42,0.96)' : '#ffffff'
+      const iwColor = dark ? '#f8fafc' : '#111827'
+      const iwBorder = dark ? '1px solid rgba(148,163,184,0.55)' : '1px solid #d1d5db'
+      iw.setContent(`<div style="padding:6px 10px;background:${iwBg};color:${iwColor};border:${iwBorder};border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.18);white-space:nowrap;pointer-events:none;font-family:sans-serif;">${sp.name}</div>`)
       iw.setPosition(pos)
       iw.open(map)
     })
     const overlay = new kakao.maps.CustomOverlay({ position: pos, content: depotEl, yAnchor: 1 })
     overlay.setMap(map)
     startPointOverlayRef.current = overlay
-  }, [mapStatus, startPoint])
+  }, [mapStatus, startPoint, themeName])
 
   // Delivery markers
   useEffect(() => {
@@ -356,23 +362,47 @@ function MapPanel({ T, themeName, deliveries, chargers, recommendedChargerId, ch
     const kakao = window.kakao
     const iw = iwRef.current
 
+    const isDark = themeName === 'dark'
+    const labelBg     = isDark ? 'rgba(15,23,42,0.96)'           : '#ffffff'
+    const labelColor  = isDark ? '#f8fafc'                        : '#111827'
+    const labelBorder = isDark ? '1px solid rgba(148,163,184,0.55)' : '1px solid #d1d5db'
+    const labelCss = `padding:4px 8px;background:${labelBg};color:${labelColor};border:${labelBorder};border-radius:6px;font-size:11px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.18);white-space:nowrap;pointer-events:none;font-family:sans-serif;max-width:160px;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;`
+
     deliveries.forEach((d, i) => {
       const pos = new kakao.maps.LatLng(d.lat, d.lng)
+
+      // Permanent name label above the circle
+      const labelEl = document.createElement('div')
+      labelEl.style.cssText = labelCss
+      labelEl.textContent = `배송지 ${i + 1} - ${d.name}`
+
+      // Circle with number
       const el = document.createElement('div')
       el.style.cssText = 'width:26px;height:26px;border-radius:50%;background:#3E6AE1;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.8);box-shadow:0 2px 6px rgba(0,0,0,.3);cursor:pointer;font-family:sans-serif'
       el.textContent = String(i + 1)
+
+      const wrapper = document.createElement('div')
+      wrapper.style.cssText = 'display:flex;flex-direction:column;align-items:center;'
+      wrapper.appendChild(labelEl)
+      wrapper.appendChild(el)
+
       el.addEventListener('click', () => {
         ignoreNextMapClickRef.current = true
         setSelectedCharger(null)
-        iw.setContent(`<div style="padding:8px;font-size:13px;">${d.name}</div>`)
+        const dark = themeNameRef.current === 'dark'
+        const iwBg     = dark ? 'rgba(15,23,42,0.96)'              : '#ffffff'
+        const iwColor  = dark ? '#f8fafc'                           : '#111827'
+        const iwBorder = dark ? '1px solid rgba(148,163,184,0.55)' : '1px solid #d1d5db'
+        iw.setContent(`<div style="padding:6px 10px;background:${iwBg};color:${iwColor};border:${iwBorder};border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.18);white-space:nowrap;pointer-events:none;font-family:sans-serif;">${d.name}</div>`)
         iw.setPosition(pos)
         iw.open(map)
       })
-      const overlay = new kakao.maps.CustomOverlay({ position: pos, content: el, yAnchor: 1 })
+
+      const overlay = new kakao.maps.CustomOverlay({ position: pos, content: wrapper, yAnchor: 1 })
       overlay.setMap(map)
       deliveryMarkersRef.current.push(overlay)
     })
-  }, [deliveries, mapStatus])
+  }, [deliveries, mapStatus, themeName])
 
   // Route polylines — renders only validated real road routes.
   // Three rendering paths:
